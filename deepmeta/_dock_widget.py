@@ -8,10 +8,10 @@ Replace code below according to your needs.
 """
 from napari_plugin_engine import napari_hook_implementation
 from qtpy.QtWidgets import QWidget, QHBoxLayout, QPushButton
-from magicgui import magic_factory
+import numpy as np
 
 
-class ExampleQWidget(QWidget):
+class SegmentLungs(QWidget):
     # your QWidget.__init__ can optionally request the napari viewer instance
     # in one of two ways:
     # 1. use a parameter called `napari_viewer`, as done here
@@ -20,22 +20,20 @@ class ExampleQWidget(QWidget):
         super().__init__()
         self.viewer = napari_viewer
 
-        btn = QPushButton("Click me!")
+        btn = QPushButton("Run Lung Seg")
         btn.clicked.connect(self._on_click)
 
         self.setLayout(QHBoxLayout())
         self.layout().addWidget(btn)
 
     def _on_click(self):
-        print("napari has", len(self.viewer.layers), "layers")
+        # run seg on slice / image
+        points = np.array([[0, 64, 64], [5, 10, 100]])
+        self.viewer.add_points(points, size=10)
 
-
-@magic_factory
-def example_magic_widget(img_layer: "napari.layers.Image"):
-    print(f"you have selected {img_layer}")
 
 
 @napari_hook_implementation
 def napari_experimental_provide_dock_widget():
     # you can return either a single widget, or a sequence of widgets
-    return [ExampleQWidget, example_magic_widget]
+    return [SegmentLungs]

@@ -55,3 +55,10 @@ If you encounter any problems, please [file an issue] along with a detailed desc
 [tox]: https://tox.readthedocs.io/en/latest/
 [pip]: https://pypi.org/project/pip/
 [PyPI]: https://pypi.org/
+
+## TODOS
+
+- [ ] Draw seg on slices
+- [ ] Config file (load model, treshold, border color, etc)
+- [ ] Seg metas
+- [ ] Display volumes
