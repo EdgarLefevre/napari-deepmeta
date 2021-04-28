@@ -62,3 +62,4 @@ If you encounter any problems, please [file an issue] along with a detailed desc
 - [ ] Config file (load model, treshold, border color, etc)
 - [ ] Seg metas
 - [ ] Display volumes
+- [ ] Btn load exemple
