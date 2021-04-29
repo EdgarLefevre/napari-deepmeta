@@ -6,8 +6,7 @@ import cv2
 import skimage.measure as measure
 
 
-def predict_seg(dataset, tresh=0.5):
-    path_model_seg = "/home/edgar/Documents/Projects/DeepMeta/data/saved_models/Poumons/best_seg_model_weighted.h5"
+def predict_seg(dataset, path_model_seg, tresh=0.5):
     if "weighted" not in path_model_seg:
         model_seg = keras.models.load_model(
             path_model_seg,
@@ -22,6 +21,7 @@ def predict_seg(dataset, tresh=0.5):
     res = model_seg.predict(dataset)
     return (res > tresh).astype(np.uint8).reshape(len(dataset), 128, 128, 1)
 
+
 def border_detected(k, seg):
     """
     Get borders from mask.
@@ -33,6 +33,7 @@ def border_detected(k, seg):
     """
     cell_contours = measure.find_contours(seg[k], 0.8)
     return cell_contours
+
 
 def weighted_cross_entropy(y_true, y_pred):
     """
@@ -80,6 +81,7 @@ def postprocess_meta(seg, k1=3, k2=3):
         res.append(dilate_and_erode(elt, k1=k1, k2=k2))  # try with 5x5
     return np.array(res)
 
+
 def remove_blobs(img):
     nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(
         img, connectivity=8
@@ -103,22 +105,22 @@ def dilate_and_erode(img, k1=3, k2=3):
     img_erosion2 = cv2.erode(img_dilation, kernel2, iterations=1)
     return img_erosion2
 
+
 def add_z(arr, z):
     final_arr = []
     for couple in arr:
         final_arr.append(np.insert(couple, 0, z))
     return np.array(final_arr)
 
-def seg_lungs(image):
-    """
 
-    :param image: Image values in [0,1]
-    :type image: np array
-    :return:
-    :rtype:
+def from_mask_to_non_plottable_list(masks):
     """
-    masks = predict_seg(image)
-    masks = postprocess_loop(masks)
+    Create a list of plottable elements (borders) from a mask list.
+    :param masks: List of np arrays containing segmentation results
+    :type masks: nd.array
+    :return: A list of plottable elements
+    :rtype: List
+    """
     non_plottable_list = []
     for i in range(len(masks)):
         plottable = []
@@ -131,9 +133,40 @@ def seg_lungs(image):
     return non_plottable_list
 
 
+def seg_lungs_(image):
+    path_model_seg = "/home/edgar/Documents/Projects/DeepMeta/data/saved_models/Poumons/best_seg_model_weighted.h5"
+    masks = predict_seg(image, path_model_seg).reshape(128, 128, 128)
+    masks = postprocess_loop(masks)
+    return masks
+
+
+def seg_lungs(image):
+    """
+
+    :param image: Image values in [0,1]
+    :type image: np array
+    :return:
+    :rtype:
+    """
+    masks = seg_lungs_(image)
+    return from_mask_to_non_plottable_list(masks)
+
 
 def seg_metas(image):
-    pass
+    """
+
+    :param image: Image values in [0,1]
+    :type image: np array
+    :return:
+    :rtype:
+    """
+    lungs_masks = seg_lungs_(image)
+    path_model_seg = "/home/edgar/Documents/Projects/DeepMeta/data/saved_models/Metastases/best_seg_weighted.h5"
+    masks = predict_seg(image, path_model_seg).reshape(128, 128, 128)
+    masks = (lungs_masks * masks).reshape(128, 128, 128)
+    print(np.shape(masks))
+    masks = postprocess_meta(masks)
+    return from_mask_to_non_plottable_list(masks)
 
 
 if __name__ == "__main__":

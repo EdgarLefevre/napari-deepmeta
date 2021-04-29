@@ -38,10 +38,8 @@ class SegmentMetas(QWidget):
     def __init__(self, napari_viewer):
         super().__init__()
         self.viewer = napari_viewer
-
-        btn = QPushButton("Run Lung Seg")
+        btn = QPushButton("Run Metastasis Seg")
         btn.clicked.connect(self._on_click)
-
         self.setLayout(QHBoxLayout())
         self.layout().addWidget(btn)
 
@@ -62,7 +60,7 @@ class SegmentMetas(QWidget):
 @napari_hook_implementation
 def napari_experimental_provide_dock_widget():
     # you can return either a single widget, or a sequence of widgets
-    return [SegmentLungs]
+    return [SegmentLungs, SegmentMetas]
 
 # todo: check image shape
 # todo: contrast (checkbox serait lourd, sinon btn seg lungs contrast)
