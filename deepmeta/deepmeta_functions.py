@@ -6,7 +6,8 @@ import cv2
 import skimage.measure as measure
 
 
-def predict_seg(dataset, path_model_seg, tresh=0.5):
+def predict_seg(dataset, tresh=0.5):
+    path_model_seg = "/home/edgar/Documents/Projects/DeepMeta/data/saved_models/Poumons/best_seg_model_weighted.h5"
     if "weighted" not in path_model_seg:
         model_seg = keras.models.load_model(
             path_model_seg,
@@ -21,30 +22,17 @@ def predict_seg(dataset, path_model_seg, tresh=0.5):
     res = model_seg.predict(dataset)
     return (res > tresh).astype(np.uint8).reshape(len(dataset), 128, 128, 1)
 
-def border_detected(dataset, k, seg, path_result, name_folder):
+def border_detected(k, seg):
     """
-    Draw mask borders on image and save it.
+    Get borders from mask.
 
-    :param dataset: Image you want to draw on
-    :type dataset: np.array
     :param k: Index of the image
     :type k: int
     :param seg: Mask
     :type seg: np.array
-    :param path_result: path where you want to save images
-    :type path_result: str
-    :param name_folder: Folder in which you want to save images.
-    :type name_folder: str
     """
     cell_contours = measure.find_contours(seg[k], 0.8)
-    fig, ax = plt.subplots(ncols=1, nrows=1, figsize=(10, 10))
-    for contour in cell_contours:
-        ax.plot(contour[:, 1], contour[:, 0], linewidth=1, color="red")
-    plt.xlim((0, 128))
-    plt.ylim((128, 0))
-    plt.imshow(dataset[k], cmap="gray")
-    plt.savefig(path_result + str(name_folder) + "/" + str(k) + ".png")
-    plt.close(fig)
+    return cell_contours
 
 def weighted_cross_entropy(y_true, y_pred):
     """
@@ -114,3 +102,49 @@ def dilate_and_erode(img, k1=3, k2=3):
     img_dilation = cv2.dilate(img, kernel1, iterations=1)
     img_erosion2 = cv2.erode(img_dilation, kernel2, iterations=1)
     return img_erosion2
+
+def add_z(arr, z):
+    final_arr = []
+    for couple in arr:
+        final_arr.append(np.insert(couple, 0, z))
+    return np.array(final_arr)
+
+def seg_lungs(image):
+    """
+
+    :param image: Image values in [0,1]
+    :type image: np array
+    :return:
+    :rtype:
+    """
+    masks = predict_seg(image)
+    masks = postprocess_loop(masks)
+    non_plottable_list = []
+    for i in range(len(masks)):
+        plottable = []
+        contours = border_detected(i, masks)
+        for contour in contours:
+            contour = add_z(contour, i)
+            plottable.append(contour)
+        if len(plottable) > 0:
+            non_plottable_list.append(plottable)
+    return non_plottable_list
+
+
+
+def seg_metas(image):
+    pass
+
+
+if __name__ == "__main__":
+    arr = [
+        [1, 2],
+        [1, 2],
+        [1, 2],
+        [1, 2],
+    ]
+    print(np.array(arr))
+    print(np.shape(arr))
+    arr = add_z(arr, 10)
+    print(arr)
+    print(np.shape(arr))
