@@ -197,16 +197,3 @@ def seg_metas(image):
     masks = postprocess_meta(masks)
     return from_mask_to_non_plottable_list(masks)
 
-
-if __name__ == "__main__":
-    arr = [
-        [1, 2],
-        [1, 2],
-        [1, 2],
-        [1, 2],
-    ]
-    print(np.array(arr))
-    print(np.shape(arr))
-    arr = add_z(arr, 10)
-    print(arr)
-    print(np.shape(arr))
