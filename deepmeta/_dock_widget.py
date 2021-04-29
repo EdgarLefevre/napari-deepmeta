@@ -7,7 +7,8 @@ see: https://napari.org/docs/dev/plugins/hook_specifications.html
 Replace code below according to your needs.
 """
 from napari_plugin_engine import napari_hook_implementation
-from qtpy.QtWidgets import QWidget, QHBoxLayout, QPushButton
+from qtpy.QtWidgets import QWidget, QHBoxLayout, QPushButton, QCheckBox
+from qtpy import QtCore
 
 
 class SegmentLungs(QWidget):
@@ -18,13 +19,26 @@ class SegmentLungs(QWidget):
         btn = QPushButton("Run Lung Seg")
         btn.clicked.connect(self._on_click)
 
+        check = QCheckBox("Contrast ?", self)
+        check.stateChanged.connect(self.clickBox)
+        self.contrast = False
+
         self.setLayout(QHBoxLayout())
         self.layout().addWidget(btn)
+        self.layout().addWidget(check)
+
+    def clickBox(self, state):
+        if state == QtCore.Qt.Checked:
+            self.contrast = True
+        else:
+            self.contrast = False
 
     def _on_click(self):
         import deepmeta.deepmeta_functions as df
         if len(self.viewer.layers) == 1:
             image = self.viewer.layers[0].data / 255
+            if self.contrast:
+                image = df.contrast_and_reshape(image)
             non_plottable = df.seg_lungs(image)
             for contours in non_plottable:
                 self.viewer.add_shapes(contours, shape_type='polygon', edge_width=1,
@@ -40,13 +54,27 @@ class SegmentMetas(QWidget):
         self.viewer = napari_viewer
         btn = QPushButton("Run Metastasis Seg")
         btn.clicked.connect(self._on_click)
+
+        check = QCheckBox("Contrast ?", self)
+        check.stateChanged.connect(self.clickBox)
+        self.contrast = False
+
         self.setLayout(QHBoxLayout())
         self.layout().addWidget(btn)
+        self.layout().addWidget(check)
+
+    def clickBox(self, state):
+        if state == QtCore.Qt.Checked:
+            self.contrast = True
+        else:
+            self.contrast = False
 
     def _on_click(self):
         import deepmeta.deepmeta_functions as df
         if len(self.viewer.layers) == 1:
             image = self.viewer.layers[0].data / 255
+            if self.contrast:
+                image = df.contrast_and_reshape(image)
             non_plottable = df.seg_metas(image)
             for contours in non_plottable:
                 self.viewer.add_shapes(contours, shape_type='polygon', edge_width=1,
@@ -63,4 +91,4 @@ def napari_experimental_provide_dock_widget():
     return [SegmentLungs, SegmentMetas]
 
 # todo: check image shape
-# todo: contrast (checkbox serait lourd, sinon btn seg lungs contrast)
+# todo: display volume infos

@@ -4,6 +4,7 @@ import tensorflow.keras as keras
 import tensorflow.keras.backend as K
 import cv2
 import skimage.measure as measure
+import skimage.exposure as exposure
 
 
 def predict_seg(dataset, path_model_seg, tresh=0.5):
@@ -151,6 +152,35 @@ def seg_lungs(image):
     masks = seg_lungs_(image)
     return from_mask_to_non_plottable_list(masks)
 
+def contrast_and_reshape(souris, size=128):
+    """
+    For some mice, we need to readjust the contrast.
+
+    :param souris: Slices of the mouse we want to segment
+    :type souris: np.array
+    :param size: Size of the images (we assume images are squares)
+    :type size: int
+    :return: Images list with readjusted contrast
+    :rtype: np.array
+
+    .. warning:
+       If the contrast pf the mouse should not be readjusted, the network will fail prediction.
+       Same if the image should be contrasted and you do not run it.
+    """
+    if len(souris.shape) > 2:
+        data = []
+        for i in np.arange(souris.shape[0]):
+            img_adapteq = exposure.equalize_adapthist(
+                souris[i], clip_limit=0.03
+            )  # clip_limit=0.03 de base
+            data.append(img_adapteq)
+        data = np.array(data).reshape(-1, size, size, 1)
+        return data
+    else:
+        img_adapteq = exposure.equalize_adapthist(souris, clip_limit=0.03)
+        img = np.array(img_adapteq).reshape(size, size, 1)
+        return img
+
 
 def seg_metas(image):
     """
@@ -164,7 +194,6 @@ def seg_metas(image):
     path_model_seg = "/home/edgar/Documents/Projects/DeepMeta/data/saved_models/Metastases/best_seg_weighted.h5"
     masks = predict_seg(image, path_model_seg).reshape(128, 128, 128)
     masks = (lungs_masks * masks).reshape(128, 128, 128)
-    print(np.shape(masks))
     masks = postprocess_meta(masks)
     return from_mask_to_non_plottable_list(masks)
 
