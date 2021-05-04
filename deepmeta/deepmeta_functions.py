@@ -150,7 +150,7 @@ def seg_lungs(image):
     :rtype:
     """
     masks = seg_lungs_(image)
-    return from_mask_to_non_plottable_list(masks)
+    return from_mask_to_non_plottable_list(masks), get_volumes(masks)
 
 def contrast_and_reshape(souris, size=128):
     """
@@ -195,5 +195,19 @@ def seg_metas(image):
     masks = predict_seg(image, path_model_seg).reshape(128, 128, 128)
     masks = (lungs_masks * masks).reshape(128, 128, 128)
     masks = postprocess_meta(masks)
-    return from_mask_to_non_plottable_list(masks)
+    return from_mask_to_non_plottable_list(masks), get_volumes(masks)
+
+
+def get_volumes(masks, vol=0.0047):
+    res = []
+    for mask in masks:
+        tmp = []
+        labels = measure.label(mask, connectivity=1)
+        for i in range(1, labels.max()+1):
+            tmp.append(
+                (labels == i).sum() * vol
+            )
+        if len(tmp) > 0:
+            res.append(tmp)
+    return res
 

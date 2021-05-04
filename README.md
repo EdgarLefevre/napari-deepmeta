@@ -26,6 +26,12 @@ You can install `napari-deepmeta` via [pip]:
 
     pip install napari-deepmeta
 
+## Usage 
+
+Open a (x, 128, 128) image, go in the plugin menu, add deepmeta plugin to the dock viewer and click on the button.
+If your image is dark, you can check the contrast option, this will enhance of the image for the network.
+
+
 ## Contributing
 
 Contributions are very welcome. Tests can be run with [tox], please ensure
@@ -58,8 +64,6 @@ If you encounter any problems, please [file an issue] along with a detailed desc
 
 ## TODOS
 
-- [ ] Draw seg on slices
 - [ ] Config file (load model, treshold, border color, etc)
-- [ ] Seg metas
 - [ ] Display volumes
 - [ ] Btn load exemple
