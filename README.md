@@ -1,6 +1,6 @@
 # napari-deepmeta
 
-[![License](https://img.shields.io/pypi/l/napari-deepmeta.svg?color=green)](https://github.com/EdgarLefevre/napari-deepmeta/raw/main/LICENSE)
+[![License](https://img.shields.io/pypi/l/napari-deepmeta.svg?color=green)](https://github.com/EdgarLefevre/napari-deepmeta/main/LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/napari-deepmeta.svg?color=green)](https://pypi.org/project/napari-deepmeta)
 [![Python Version](https://img.shields.io/pypi/pyversions/napari-deepmeta.svg?color=green)](https://python.org)
 [![tests](https://github.com/EdgarLefevre/napari-deepmeta/workflows/tests/badge.svg)](https://github.com/EdgarLefevre/napari-deepmeta/actions)
