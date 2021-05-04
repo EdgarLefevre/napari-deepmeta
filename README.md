@@ -4,7 +4,7 @@
 [![PyPI](https://img.shields.io/pypi/v/napari-deepmeta.svg?color=green)](https://pypi.org/project/napari-deepmeta)
 [![Python Version](https://img.shields.io/pypi/pyversions/napari-deepmeta.svg?color=green)](https://python.org)
 [![tests](https://github.com/EdgarLefevre/napari-deepmeta/workflows/tests/badge.svg)](https://github.com/EdgarLefevre/napari-deepmeta/actions)
-[![codecov](https://codecov.io/gh/EdgarLefevre/napari-deepmeta/branch/master/graph/badge.svg)](https://codecov.io/gh/EdgarLefevre/napari-deepmeta)
+[![codecov](https://codecov.io/gh/EdgarLefevre/napari-deepmeta/branch/main/graph/badge.svg?token=H41ZaCAg31)](https://codecov.io/gh/EdgarLefevre/napari-deepmeta)
 
 Segment mouse lungs and metastasis on MRI images.
 
