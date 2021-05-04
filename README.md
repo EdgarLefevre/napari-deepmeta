@@ -1,6 +1,6 @@
 # napari-deepmeta
 
-[![License](https://img.shields.io/pypi/l/napari-deepmeta.svg?color=green)](https://github.com/EdgarLefevre/napari-deepmeta/raw/master/LICENSE)
+[![License](https://img.shields.io/pypi/l/napari-deepmeta.svg?color=green)](https://github.com/EdgarLefevre/napari-deepmeta/raw/main/LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/napari-deepmeta.svg?color=green)](https://pypi.org/project/napari-deepmeta)
 [![Python Version](https://img.shields.io/pypi/pyversions/napari-deepmeta.svg?color=green)](https://python.org)
 [![tests](https://github.com/EdgarLefevre/napari-deepmeta/workflows/tests/badge.svg)](https://github.com/EdgarLefevre/napari-deepmeta/actions)
@@ -62,8 +62,3 @@ If you encounter any problems, please [file an issue] along with a detailed desc
 [pip]: https://pypi.org/project/pip/
 [PyPI]: https://pypi.org/
 
-## TODOS
-
-- [ ] Config file (load model, treshold, border color, etc)
-- [ ] Display volumes
-- [ ] Btn load exemple
