@@ -5,7 +5,7 @@ import pytest
 # this is your plugin name declared in your napari.plugins entry point
 MY_PLUGIN_NAME = "napari-deepmeta"
 # the name of your widget(s)
-MY_WIDGET_NAMES = [SegmentMetas, SegmentLungs]
+MY_WIDGET_NAMES = []
 
 
 @pytest.mark.parametrize("widget_name", MY_WIDGET_NAMES)
