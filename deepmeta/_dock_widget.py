@@ -1,5 +1,5 @@
 from napari_plugin_engine import napari_hook_implementation
-from qtpy.QtWidgets import QWidget, QHBoxLayout, QPushButton, QCheckBox, QLabel, QVBoxLayout
+from qtpy.QtWidgets import QWidget, QPushButton, QCheckBox, QLabel, QVBoxLayout
 from qtpy import QtCore
 import numpy as np
 
@@ -159,6 +159,4 @@ def napari_experimental_provide_dock_widget():
     # you can return either a single widget, or a sequence of widgets
     return [SegmentLungs, SegmentMetas]
 
-# todo: text property is capricious, need to bold that thing
-# todo: refactor and clean code
 # todo: btn reprocess volume (recalculer le volume si modif de masks)
