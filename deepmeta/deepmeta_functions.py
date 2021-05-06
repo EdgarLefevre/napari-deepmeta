@@ -219,4 +219,3 @@ def get_volumes(masks, vol=0.0047):
         if len(tmp) > 0:
             res.append(tmp)
     return res
-
