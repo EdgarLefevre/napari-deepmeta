@@ -1,5 +1,5 @@
 from deepmeta import napari_experimental_provide_dock_widget
-from deepmeta._dock_widget import SegmentMetas, SegmentLungs
+import deepmeta._dock_widget as dw
 import pytest
 
 # this is your plugin name declared in your napari.plugins entry point
@@ -16,3 +16,9 @@ def test_something_with_viewer(widget_name, make_napari_viewer):
         plugin_name=MY_PLUGIN_NAME, widget_name=widget_name
     )
     assert len(viewer.window._dock_widgets) == num_dw + 1
+
+
+def test_fix_v():
+    v = [1, 2, 3]
+    contours = [1, 2, 3, 4, 5]
+    assert dw.fix_v(v, contours) == [1, 2, 3, 0, 0]

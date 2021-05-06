@@ -118,16 +118,33 @@ class SegmentMetas(QWidget):
     def __init__(self, napari_viewer):
         super().__init__()
         self.viewer = napari_viewer
+        self.setLayout(QVBoxLayout())
+
         btn = QPushButton("Run Metastasis Seg")
         btn.clicked.connect(self._on_click)
+        self.layout().addWidget(btn)
 
         check = QCheckBox("Contrast ?", self)
         check.stateChanged.connect(self.clickBox)
         self.contrast = False
-
-        self.setLayout(QVBoxLayout())
-        self.layout().addWidget(btn)
         self.layout().addWidget(check)
+
+        btn2 = QPushButton("Reprocess volume")
+        btn2.clicked.connect(self._reprocess_volume)
+        self.layout().addWidget(btn2)
+
+    def _reprocess_volume(self):
+        new_vol = 0
+        layers = self.viewer.layers[1:]
+        for shape in layers:
+            for contour in shape.data:
+                contour = np.uint8(contour.round())
+                mask = np.zeros((128, 128))
+                mask[contour[:, 1], contour[:, 2]] = 1
+                mask = ndimage.morphology.binary_fill_holes(mask)
+                new_vol += mask.sum()
+        elt = QLabel("New total volume {:.3f}mm3".format(new_vol*0.0047))
+        self.layout().addWidget(elt)
 
     def clickBox(self, state):
         if state == QtCore.Qt.Checked:
