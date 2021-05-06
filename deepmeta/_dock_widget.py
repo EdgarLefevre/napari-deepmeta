@@ -60,7 +60,7 @@ class SegmentLungs(QWidget):
         self.layout().addWidget(elt)
 
         # self.layout().count()  # get nb of widgets
-        # self.layout().itemAt(3).widget().setParent(None) # remove the forth widget of the list
+        # self.layout().itemAt(3).widget().setParent(None) # remove the forth widget of the list (our label widget)
 
 
 

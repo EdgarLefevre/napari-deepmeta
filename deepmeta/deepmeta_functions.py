@@ -164,7 +164,7 @@ def contrast_and_reshape(souris, size=128):
     :rtype: np.array
 
     .. warning:
-       If the contrast pf the mouse should not be readjusted, the network will fail prediction.
+       If the contrast of the mouse should not be readjusted, the network will fail prediction.
        Same if the image should be contrasted and you do not run it.
     """
     if len(souris.shape) > 2:
@@ -199,6 +199,15 @@ def seg_metas(image):
 
 
 def get_volumes(masks, vol=0.0047):
+    """
+    Get each volumes (volume on slice).
+    :param masks:
+    :type masks:
+    :param vol:
+    :type vol:
+    :return:
+    :rtype:
+    """
     res = []
     for mask in masks:
         tmp = []
