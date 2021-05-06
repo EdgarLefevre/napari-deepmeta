@@ -19,10 +19,10 @@ def test_something_with_viewer(widget_name, make_napari_viewer):
     )
     assert len(viewer.window._dock_widgets) == num_dw + 1
 
-
-def test_add_z():
-    arr = np.array([[0, 1], [0, 1]])
-    assert (df.add_z(arr, 3) == np.array([[3, 0, 1], [3, 0, 1]])).all()
+#
+# def test_add_z():
+#     arr = np.array([[0, 1], [0, 1]])
+#     assert (df.add_z(arr, 3) == np.array([[3, 0, 1], [3, 0, 1]])).all()
 
 
 def test_fix_v():
