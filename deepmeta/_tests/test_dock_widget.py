@@ -1,8 +1,6 @@
 from deepmeta import napari_experimental_provide_dock_widget
 import pytest
-import deepmeta.deepmeta_functions as df
-import deepmeta._dock_widget as dw
-import numpy as np
+
 
 # this is your plugin name declared in your napari.plugins entry point
 MY_PLUGIN_NAME = "napari-deepmeta"
@@ -19,13 +17,3 @@ def test_something_with_viewer(widget_name, make_napari_viewer):
     )
     assert len(viewer.window._dock_widgets) == num_dw + 1
 
-#
-# def test_add_z():
-#     arr = np.array([[0, 1], [0, 1]])
-#     assert (df.add_z(arr, 3) == np.array([[3, 0, 1], [3, 0, 1]])).all()
-
-
-def test_fix_v():
-    v = [1, 2, 3]
-    contours = [1, 2, 3, 4, 5]
-    assert dw.fix_v(v, contours) == [1, 2, 3, 0, 0]
