@@ -32,3 +32,14 @@ def test_fix_v():
     contours = [1, 2, 3, 4, 5]
     assert dw.fix_v(v, contours) == [1, 2, 3, 0, 0]
 
+def test_get_volumes():
+    import deepmeta.deepmeta_functions as df
+    import numpy as np
+    arr = np.array([
+        [1, 0, 0],
+        [0, 0, 1],
+        [1, 0, 0]
+    ])
+    res = df.get_volumes(arr)
+    assert res == [[0.0047], [0.0047], [0.0047]]
+
