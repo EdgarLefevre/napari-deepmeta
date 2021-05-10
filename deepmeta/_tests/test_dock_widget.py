@@ -43,3 +43,10 @@ def test_get_volumes():
     res = df.get_volumes(arr)
     assert res == [[0.0047], [0.0047], [0.0047]]
 
+def test_dilate_and_erode():
+    import deepmeta.deepmeta_functions as df
+    import numpy as np
+    img = np.zeros((128, 128))
+    res = df.dilate_and_erode(img)
+    assert np.shape(img) == np.shape(res)
+

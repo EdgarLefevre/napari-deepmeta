@@ -220,11 +220,3 @@ def get_volumes(masks, vol=0.0047):
             res.append(tmp)
     return res
 
-if __name__ == "__main__":
-    arr = np.array([
-        [1,0,0],
-        [0,0,1],
-        [1,0,0]
-    ])
-    res = get_volumes(arr)
-    print(res)
