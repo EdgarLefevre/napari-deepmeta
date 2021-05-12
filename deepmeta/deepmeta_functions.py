@@ -252,3 +252,7 @@ def load_config():
     cfg = ConfigParser()
     cfg.read(cfg_loc)
     return cfg
+
+if __name__ == "__main__":
+    cfg = load_config()
+    print(cfg["Deepmeta"] is not None)

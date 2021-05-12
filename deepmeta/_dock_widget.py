@@ -115,7 +115,7 @@ class SegmentLungs(QWidget):
                         image = df.contrast_and_reshape(image)
                     non_plottable, vols = df.seg_lungs(image, self.cfg)
                     show_total_vol(self.layout(), vols)
-                    show_shapes(self.viewer, non_plottable, vols, 'red')
+                    show_shapes(self.viewer, non_plottable, vols, self.cfg["Deepmeta"]["color_lungs"])
                 else:
                     print("Image shape should be (X, 128, 128)")
             except IndexError:
@@ -175,7 +175,7 @@ class SegmentMetas(QWidget):
                         image = df.contrast_and_reshape(image)
                     non_plottable, vols = df.seg_metas(image, self.cfg)
                     show_total_vol(self.layout(), vols)
-                    show_shapes(self.viewer, non_plottable, vols, 'blue')
+                    show_shapes(self.viewer, non_plottable, vols, self.cfg["Deepmeta"]["color_metas"])
                 else:
                     print("Image shape should be (X, 128, 128)")
             except IndexError:
