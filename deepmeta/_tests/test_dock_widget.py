@@ -40,7 +40,7 @@ def test_get_volumes():
         [0, 0, 1],
         [1, 0, 0]
     ])
-    res = df.get_volumes(arr)
+    res = df.get_volumes(arr, 0.0047)
     assert res == [[0.0047], [0.0047], [0.0047]]
 
 
