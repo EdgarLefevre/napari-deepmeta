@@ -1,3 +1,9 @@
+"""
+Deepmeta functions
+====================
+This file contains all function relative to deepmeta's original code
+"""
+
 import numpy as np
 from pathlib import Path
 from appdirs import user_config_dir
@@ -10,7 +16,19 @@ import skimage.measure as measure
 import skimage.exposure as exposure
 
 
-def predict_seg(dataset, path_model_seg, tresh=0.5):
+def predict_seg(dataset, path_model_seg, thresh=0.5):
+    """
+    Run inference.
+
+    :param dataset: Imgs to segment
+    :type dataset: np.array
+    :param path_model_seg: Path of model
+    :type path_model_seg: str
+    :param thresh: Threshold value to binarize output mask [0,1]
+    :type thresh: float
+    :return: List of output binary masks
+    :rtype: np.array
+    """
     if "weighted" not in path_model_seg:
         model_seg = keras.models.load_model(
             path_model_seg,
@@ -23,7 +41,7 @@ def predict_seg(dataset, path_model_seg, tresh=0.5):
             },
         )
     res = model_seg.predict(dataset)
-    return (res > tresh).astype(np.uint8).reshape(len(dataset), 128, 128, 1)
+    return (res > thresh).astype(np.uint8).reshape(len(dataset), 128, 128, 1)
 
 
 def border_detected(k, seg):
@@ -42,6 +60,7 @@ def border_detected(k, seg):
 def weighted_cross_entropy(y_true, y_pred):
     """
     -- Fonction de coût pondéré --
+
     :param y_true: vrai valeur de y (label)
     :param y_pred: valeur prédite de y par le modèle
     :return: valeur de la fonction de cout d'entropie croisée pondérée
@@ -71,6 +90,16 @@ def weighted_cross_entropy(y_true, y_pred):
 
 
 def postprocess_loop(seg, cfg):
+    """
+    Run all post process actions on network output
+
+    :param seg: Network output (binarized)
+    :type seg: np.array
+    :param cfg: Config object
+    :type cfg: ConfigParser
+    :return: Seg postprocessed
+    :rtype: np.array
+    """
     res = []
     for elt in seg:
         blobed = remove_blobs(elt)
@@ -90,6 +119,14 @@ def postprocess_meta(seg, k1, k2):
 
 
 def remove_blobs(img):
+    """
+    Remove small blobs (size < 10px) in mask.
+
+    :param img: Mask
+    :type img: np.array
+    :return: Mask without blobs
+    :rtype: np.array
+    """
     nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(
         img, connectivity=8
     )
@@ -105,6 +142,18 @@ def remove_blobs(img):
 
 
 def dilate_and_erode(img, k1=3, k2=3):
+    """
+    Dilate and erode a mask.
+
+    :param img: Mask
+    :type img: np.array
+    :param k1: Size of dilatation kernel
+    :type k1: int
+    :param k2: Size of erosion kernel
+    :type k2: int
+    :return: Mask processed
+    :rtype: np.array
+    """
     kernel1 = np.ones((k1, k1), np.uint8)
     kernel2 = np.ones((k2, k2), np.uint8)
 
@@ -114,6 +163,16 @@ def dilate_and_erode(img, k1=3, k2=3):
 
 
 def add_z(arr, z):
+    """
+    Add z dimension to contours lines.
+
+    :param arr: Contour line list
+    :type arr: List
+    :param z: Z index to add
+    :type z: int
+    :return: Arr with a z dim added
+    :rtype: List
+    """
     final_arr = []
     for couple in arr:
         final_arr.append(np.insert(couple, 0, z))
@@ -123,6 +182,7 @@ def add_z(arr, z):
 def from_mask_to_non_plottable_list(masks):
     """
     Create a list of plottable elements (borders) from a mask list.
+
     :param masks: List of np arrays containing segmentation results
     :type masks: nd.array
     :return: A list of plottable elements
@@ -141,6 +201,16 @@ def from_mask_to_non_plottable_list(masks):
 
 
 def seg_lungs_(image, cfg):
+    """
+    Segment and postprocess lungs.
+
+    :param image: Image values in [0,1]
+    :type image: np array
+    :param cfg: Config parser object
+    :type cfg: ConfigParser
+    :return: Masks list
+    :rtype: List
+    """
     path_model_seg = cfg["Deepmeta"]["path_model_lungs"]
     masks = predict_seg(image, path_model_seg).reshape(128, 128, 128)
     masks = postprocess_loop(masks, cfg)
@@ -149,11 +219,14 @@ def seg_lungs_(image, cfg):
 
 def seg_lungs(image, cfg):
     """
+    Segment lungs.
 
     :param image: Image values in [0,1]
     :type image: np array
-    :return:
-    :rtype:
+    :param cfg: Config parser object
+    :type cfg: ConfigParser
+    :return: A list of contours lines, list of volumes
+    :rtype: List, List
     """
     masks = seg_lungs_(image, cfg)
     return from_mask_to_non_plottable_list(masks), get_volumes(masks, float(cfg["Deepmeta"]["volume"]))
@@ -161,7 +234,7 @@ def seg_lungs(image, cfg):
 
 def contrast_and_reshape(souris, size=128):
     """
-    For some mice, we need to readjust the contrast.
+    Enhance image contrast.
 
     :param souris: Slices of the mouse we want to segment
     :type souris: np.array
@@ -191,11 +264,12 @@ def contrast_and_reshape(souris, size=128):
 
 def seg_metas(image, cfg):
     """
+    Segment metastasis.
 
     :param image: Image values in [0,1]
-    :type image: np array
-    :return:
-    :rtype:
+    :type image: np.array
+    :return: A list of contours lines, list of volumes
+    :rtype: List, List
     """
     lungs_masks = seg_lungs_(image, cfg)
     path_model_seg = cfg["Deepmeta"]["path_model_metas"]
@@ -211,12 +285,13 @@ def seg_metas(image, cfg):
 def get_volumes(masks, vol):
     """
     Get each volumes (volume on slice).
-    :param masks:
-    :type masks:
-    :param vol:
-    :type vol:
-    :return:
-    :rtype:
+
+    :param masks: Pred mask list
+    :type masks: List
+    :param vol: Volume of one voxel
+    :type vol: float
+    :return: A list of all volumes per slice
+    :rtype: List
     """
     res = []
     for mask in masks:
@@ -232,6 +307,12 @@ def get_volumes(masks, vol):
 
 
 def load_config():
+    """
+    Function to parse config file, create default one in ~/.config/deepmeta/config.ini.
+
+    :return: An object with all config file parsed
+    :rtype: ConfigParser
+    """
     cfg_loc = Path(user_config_dir(appname="deepmeta")) / "config.ini"
     if not cfg_loc.exists():
         cfg_loc.parent.mkdir(parents=True, exist_ok=True)
@@ -253,6 +334,4 @@ def load_config():
     cfg.read(cfg_loc)
     return cfg
 
-if __name__ == "__main__":
-    cfg = load_config()
-    print(cfg["Deepmeta"] is not None)
+
