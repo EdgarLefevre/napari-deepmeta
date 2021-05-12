@@ -75,11 +75,11 @@ def test_show_shapes(make_napari_viewer):
     dw.show_shapes(viewer, res, [[5]], 'red')
     assert len(viewer.layers) == 1
 
-
-def test_show_total_vol(make_napari_viewer):
-    import deepmeta._dock_widget as dw
-
-    viewer = make_napari_viewer()
-    count = len(viewer.window.menuWidget())
-    dw.show_total_vol(viewer, [5])
-    assert (count + 1) == len(viewer.window._widgets)
+#
+# def test_show_total_vol(make_napari_viewer):
+#     import deepmeta._dock_widget as dw
+#
+#     viewer = make_napari_viewer()
+#     count = len(viewer.window.menuWidget())
+#     dw.show_total_vol(viewer, [5])
+#     assert (count + 1) == len(viewer.window._widgets)
