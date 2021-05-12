@@ -152,6 +152,7 @@ def seg_lungs(image):
     masks = seg_lungs_(image)
     return from_mask_to_non_plottable_list(masks), get_volumes(masks)
 
+
 def contrast_and_reshape(souris, size=128):
     """
     For some mice, we need to readjust the contrast.
@@ -212,7 +213,7 @@ def get_volumes(masks, vol=0.0047):
     for mask in masks:
         tmp = []
         labels = measure.label(mask, connectivity=1)
-        for i in range(1, labels.max()+1):
+        for i in range(1, labels.max() + 1):
             tmp.append(
                 (labels == i).sum() * vol
             )

@@ -7,7 +7,7 @@ import scipy.ndimage as ndimage
 
 def create_text(vols):
     text_parameters = {
-        'text': 'volume : {vol:.3f}',
+        'text': 'volume : {vol:.3f}mm3',
         'size': 12,
         'color': 'lavender',  # mintcream works too
         # colorlist: https://github.com/vispy/vispy/blob/main/vispy/color/_color_dict.py
@@ -22,9 +22,44 @@ def create_text(vols):
 
 
 def fix_v(v, contours):
+    # unused
     while len(v) < len(contours):
         v.append(0)
     return v
+
+
+def fix_contours(v, contours):
+    contours.sort(key=len)
+    v.sort()
+    while len(contours) > len(v):
+        contours.pop(0)
+    return contours
+
+
+def show_shapes(viewer, non_plottable, vols, color):
+    for i, contours in enumerate(non_plottable):
+        v = vols[i]
+        text_p, prop = create_text(v)
+        try:
+            viewer.add_shapes(contours, shape_type='polygon', edge_width=1,
+                              edge_color=color, face_color="#6a6a6aff",
+                              opacity=0.3, name="Mask " + str(i), properties=prop,
+                              text=text_p
+                              )
+        except ValueError:
+            contours = fix_contours(v, contours)
+            text_p, prop = create_text(v)
+            viewer.add_shapes(contours, shape_type='polygon', edge_width=1,
+                              edge_color=color, face_color="#6a6a6aff",
+                              opacity=0.3, name="Mask " + str(i), properties=prop,
+                              text=text_p
+                              )
+
+
+def show_total_vol(layout, vols):
+    vol_tot = np.array([np.array(l).sum() for l in vols]).sum()
+    elt = QLabel("Total volume {:.3f}mm3".format(vol_tot))
+    layout.addWidget(elt)
 
 
 class SegmentLungs(QWidget):
@@ -38,7 +73,7 @@ class SegmentLungs(QWidget):
         self.layout().addWidget(btn)
 
         check = QCheckBox("Contrast ?", self)
-        check.stateChanged.connect(self.clickBox)
+        check.stateChanged.connect(self._click_box)
         self.contrast = False
         self.layout().addWidget(check)
 
@@ -47,52 +82,25 @@ class SegmentLungs(QWidget):
         self.layout().addWidget(btn2)
 
     def _reprocess_volume(self):
-        new_vol = 0
-        layers = self.viewer.layers[1:]
-        for shape in layers:
-            for contour in shape.data:
-                contour = np.uint8(contour.round())
-                mask = np.zeros((128, 128))
-                mask[contour[:, 1], contour[:, 2]] = 1
-                mask = ndimage.morphology.binary_fill_holes(mask)
-                new_vol += mask.sum()
-        elt = QLabel("New total volume {:.3f}mm3".format(new_vol*0.0047))
-        self.layout().addWidget(elt)
+        if self.layout().count() == 4:
+            new_vol = 0
+            layers = self.viewer.layers[1:]
+            for shape in layers:
+                for contour in shape.data:
+                    contour = np.uint8(contour.round())
+                    mask = np.zeros((128, 128))
+                    mask[contour[:, 1], contour[:, 2]] = 1
+                    mask = ndimage.morphology.binary_fill_holes(mask)
+                    new_vol += mask.sum()
+            self.layout().itemAt(3).widget().setParent(None)
+            elt = QLabel("New total volume {:.3f}mm3".format(new_vol * 0.0047))
+            self.layout().addWidget(elt)
 
-        # self.layout().count()  # get nb of widgets
-        # self.layout().itemAt(3).widget().setParent(None) # remove the forth widget of the list (our label widget)
-
-
-
-    def clickBox(self, state):
+    def _click_box(self, state):
         if state == QtCore.Qt.Checked:
             self.contrast = True
         else:
             self.contrast = False
-
-    def show_total_vol(self, vols):
-        vol_tot = np.array([np.array(l).sum() for l in vols]).sum()
-        elt = QLabel("Total volume {:.3f}mm3".format(vol_tot))
-        self.layout().addWidget(elt)
-
-    def show_shapes(self, non_plottable, vols):
-        for i, contours in enumerate(non_plottable):
-            v = vols[i]
-            text_p, prop = create_text(v)
-            try:
-                self.viewer.add_shapes(contours, shape_type='polygon', edge_width=1,
-                                       edge_color='red', face_color="#6a6a6aff",
-                                       opacity=0.3, name="Mask " + str(i), properties=prop,
-                                       text=text_p
-                                       )
-            except ValueError:
-                v = fix_v(v, contours)
-                text_p, prop = create_text(v)
-                self.viewer.add_shapes(contours, shape_type='polygon', edge_width=1,
-                                       edge_color='red', face_color="#6a6a6aff",
-                                       opacity=0.3, name="Mask " + str(i), properties=prop,
-                                       text=text_p
-                                       )
 
     def _on_click(self):
         import deepmeta.deepmeta_functions as df
@@ -104,8 +112,8 @@ class SegmentLungs(QWidget):
                     if self.contrast:
                         image = df.contrast_and_reshape(image)
                     non_plottable, vols = df.seg_lungs(image)
-                    self.show_total_vol(vols)
-                    self.show_shapes(non_plottable, vols)
+                    show_total_vol(self.layout(), vols)
+                    show_shapes(self.viewer, non_plottable, vols, 'red')
                 else:
                     print("Image shape should be (X, 128, 128)")
             except IndexError:
@@ -125,7 +133,7 @@ class SegmentMetas(QWidget):
         self.layout().addWidget(btn)
 
         check = QCheckBox("Contrast ?", self)
-        check.stateChanged.connect(self.clickBox)
+        check.stateChanged.connect(self._click_box)
         self.contrast = False
         self.layout().addWidget(check)
 
@@ -143,38 +151,14 @@ class SegmentMetas(QWidget):
                 mask[contour[:, 1], contour[:, 2]] = 1
                 mask = ndimage.morphology.binary_fill_holes(mask)
                 new_vol += mask.sum()
-        elt = QLabel("New total volume {:.3f}mm3".format(new_vol*0.0047))
+        elt = QLabel("New total volume {:.3f}mm3".format(new_vol * 0.0047))
         self.layout().addWidget(elt)
 
-    def clickBox(self, state):
+    def _click_box(self, state):
         if state == QtCore.Qt.Checked:
             self.contrast = True
         else:
             self.contrast = False
-
-    def show_total_vol(self, vols):
-        vol_tot = np.array([np.array(l).sum() for l in vols]).sum()
-        elt = QLabel("Total volume {:.3f}mm3".format(vol_tot))
-        self.layout().addWidget(elt)
-
-    def show_shapes(self, non_plottable, vols):
-        for i, contours in enumerate(non_plottable):
-            v = vols[i]
-            text, t_prop = create_text(v)
-            try:
-                self.viewer.add_shapes(contours, shape_type='polygon', edge_width=1,
-                                       edge_color='blue', face_color="#6a6a6aff",
-                                       opacity=0.3, name="Mask " + str(i), text=text,
-                                       properties=t_prop
-                                       )
-            except ValueError:
-                v = fix_v(v, contours)
-                text, t_prop = create_text(v)
-                self.viewer.add_shapes(contours, shape_type='polygon', edge_width=1,
-                                       edge_color='blue', face_color="#6a6a6aff",
-                                       opacity=0.3, name="Mask " + str(i), text=text,
-                                       properties=t_prop
-                                       )
 
     def _on_click(self):
         import deepmeta.deepmeta_functions as df
@@ -186,8 +170,8 @@ class SegmentMetas(QWidget):
                     if self.contrast:
                         image = df.contrast_and_reshape(image)
                     non_plottable, vols = df.seg_metas(image)
-                    self.show_total_vol(vols)
-                    self.show_shapes(non_plottable, vols)
+                    show_total_vol(self.layout(), vols)
+                    show_shapes(self.viewer, non_plottable, vols, 'blue')
                 else:
                     print("Image shape should be (X, 128, 128)")
             except IndexError:
@@ -200,4 +184,3 @@ class SegmentMetas(QWidget):
 def napari_experimental_provide_dock_widget():
     # you can return either a single widget, or a sequence of widgets
     return [SegmentLungs, SegmentMetas]
-
