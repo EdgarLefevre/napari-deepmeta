@@ -64,7 +64,9 @@ def show_total_vol(layout, vols):
 
 class SegmentLungs(QWidget):
     def __init__(self, napari_viewer):
+        import deepmeta.deepmeta_functions as df
         super().__init__()
+        self.cfg = df.load_config()
         self.viewer = napari_viewer
         self.setLayout(QVBoxLayout())
 
@@ -111,7 +113,7 @@ class SegmentLungs(QWidget):
                 if im_shape[-1] == 128 and im_shape[-2] == 128:
                     if self.contrast:
                         image = df.contrast_and_reshape(image)
-                    non_plottable, vols = df.seg_lungs(image)
+                    non_plottable, vols = df.seg_lungs(image, self.cfg)
                     show_total_vol(self.layout(), vols)
                     show_shapes(self.viewer, non_plottable, vols, 'red')
                 else:
@@ -124,7 +126,9 @@ class SegmentLungs(QWidget):
 
 class SegmentMetas(QWidget):
     def __init__(self, napari_viewer):
+        import deepmeta.deepmeta_functions as df
         super().__init__()
+        self.cfg = df.load_config()
         self.viewer = napari_viewer
         self.setLayout(QVBoxLayout())
 
@@ -169,7 +173,7 @@ class SegmentMetas(QWidget):
                 if im_shape[-1] == 128 and im_shape[-2] == 128:
                     if self.contrast:
                         image = df.contrast_and_reshape(image)
-                    non_plottable, vols = df.seg_metas(image)
+                    non_plottable, vols = df.seg_metas(image, self.cfg)
                     show_total_vol(self.layout(), vols)
                     show_shapes(self.viewer, non_plottable, vols, 'blue')
                 else:

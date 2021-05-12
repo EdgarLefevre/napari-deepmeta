@@ -1,4 +1,7 @@
 import numpy as np
+from pathlib import Path
+from appdirs import user_config_dir
+from configparser import ConfigParser
 import tensorflow as tf
 import tensorflow.keras as keras
 import tensorflow.keras.backend as K
@@ -67,16 +70,19 @@ def weighted_cross_entropy(y_true, y_pred):
     return K.mean(tf.multiply(weight, entropy), axis=-1)
 
 
-def postprocess_loop(seg):
+def postprocess_loop(seg, cfg):
     res = []
     for elt in seg:
         blobed = remove_blobs(elt)
-        eroded = dilate_and_erode(blobed)
+        eroded = dilate_and_erode(blobed,
+                                  int(cfg["Deepmeta"]["Kernel1_size_lungs"]),
+                                  int(cfg["Deepmeta"]["Kernel2_size_lungs"])
+                                  )
         res.append(eroded / 255)
     return np.array(res)
 
 
-def postprocess_meta(seg, k1=3, k2=3):
+def postprocess_meta(seg, k1, k2):
     res = []
     for elt in seg:
         res.append(dilate_and_erode(elt, k1=k1, k2=k2))  # try with 5x5
@@ -134,14 +140,14 @@ def from_mask_to_non_plottable_list(masks):
     return non_plottable_list
 
 
-def seg_lungs_(image):
-    path_model_seg = "/home/edgar/Documents/Projects/DeepMeta/data/saved_models/Poumons/best_seg_model_weighted.h5"
+def seg_lungs_(image, cfg):
+    path_model_seg = cfg["Deepmeta"]["path_model_lungs"]
     masks = predict_seg(image, path_model_seg).reshape(128, 128, 128)
-    masks = postprocess_loop(masks)
+    masks = postprocess_loop(masks, cfg)
     return masks
 
 
-def seg_lungs(image):
+def seg_lungs(image, cfg):
     """
 
     :param image: Image values in [0,1]
@@ -149,8 +155,8 @@ def seg_lungs(image):
     :return:
     :rtype:
     """
-    masks = seg_lungs_(image)
-    return from_mask_to_non_plottable_list(masks), get_volumes(masks)
+    masks = seg_lungs_(image, cfg)
+    return from_mask_to_non_plottable_list(masks), get_volumes(masks, float(cfg["Deepmeta"]["volume"]))
 
 
 def contrast_and_reshape(souris, size=128):
@@ -183,7 +189,7 @@ def contrast_and_reshape(souris, size=128):
         return img
 
 
-def seg_metas(image):
+def seg_metas(image, cfg):
     """
 
     :param image: Image values in [0,1]
@@ -191,15 +197,18 @@ def seg_metas(image):
     :return:
     :rtype:
     """
-    lungs_masks = seg_lungs_(image)
-    path_model_seg = "/home/edgar/Documents/Projects/DeepMeta/data/saved_models/Metastases/best_seg_weighted.h5"
+    lungs_masks = seg_lungs_(image, cfg)
+    path_model_seg = cfg["Deepmeta"]["path_model_metas"]
     masks = predict_seg(image, path_model_seg).reshape(128, 128, 128)
     masks = (lungs_masks * masks).reshape(128, 128, 128)
-    masks = postprocess_meta(masks)
-    return from_mask_to_non_plottable_list(masks), get_volumes(masks)
+    masks = postprocess_meta(masks,
+                             int(cfg["Deepmeta"]["Kernel1_size_metas"]),
+                             int(cfg["Deepmeta"]["Kernel2_size_metas"])
+                             )
+    return from_mask_to_non_plottable_list(masks), get_volumes(masks, float(cfg["Deepmeta"]["volume"]))
 
 
-def get_volumes(masks, vol=0.0047):
+def get_volumes(masks, vol):
     """
     Get each volumes (volume on slice).
     :param masks:
@@ -221,3 +230,25 @@ def get_volumes(masks, vol=0.0047):
             res.append(tmp)
     return res
 
+
+def load_config():
+    cfg_loc = Path(user_config_dir(appname="deepmeta")) / "config.ini"
+    if not cfg_loc.exists():
+        cfg_loc.parent.mkdir(parents=True, exist_ok=True)
+        with open(cfg_loc, mode="a+") as f:
+            f.write(
+                "[Deepmeta]\n"
+                "volume = 0.0047\n"
+                "path_model_lungs = /home/edgar/Documents/Projects/DeepMeta/data/saved_models/Poumons/best_seg_model_weighted.h5\n"
+                "path_model_metas = /home/edgar/Documents/Projects/DeepMeta/data/saved_models/Metastases/best_seg_weighted.h5\n"
+                "Kernel1_size_lungs = 3\n"
+                "Kernel2_size_lungs = 3\n"
+                "Kernel1_size_metas = 3\n"
+                "Kernel2_size_metas = 3\n"
+                "color_lungs = red\n"
+                "color_metas = blue\n"
+            )
+        print(f"Initialized new default config at {cfg_loc}.")
+    cfg = ConfigParser()
+    cfg.read(cfg_loc)
+    return cfg
