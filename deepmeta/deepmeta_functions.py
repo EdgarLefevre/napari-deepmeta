@@ -1,7 +1,7 @@
 """
 Deepmeta functions
 ====================
-This file contains all function relative to deepmeta's original code
+In this section you will find all information about functions relative to deepmeta's original code.
 """
 
 import numpy as np

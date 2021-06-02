@@ -30,19 +30,35 @@ You can install `napari-deepmeta` via [pip]:
 
     pip install napari-deepmeta
 
-## Usage 
+## Usage
+
 
 Open a (x, 128, 128) image, go in the plugin menu, add deepmeta plugin to the dock viewer and click on the button.
-If your image is dark, you can check the contrast option, this will enhance of the image for the network.
+
+![Menu](docs/_static/plugin_menu.png)
+
+By adding the dock widget, a menu will be created on the left of your Napari instance.
+
+![Deepmeta panel](docs/_static/panel.png)
+
+In this panel you will find two buttons and one checkbox:
+
++ The first button *Run lung seg* process segmentation and show the result (With the widget segment metas, the button is called *Run meta seg*).
++ The second, *Reprocess Volume*, is useful when you modify contours. It will reprocess all slices to give you a new volume.
++ The checkbox is here to enhance contrast if your image is dark.
+
 
 ## Conf file and custom models
 
 The first time you run the plugin a config file will be created at `~/.config/deepmeta/config.ini`.
 
-In this file you can find parameters for postprocessing loop and the path for the models.
-If you want to try another model, you can change the path. 
+![conf.ini](docs/_static/confini.png)
 
->Be careful to not having custom objects in you model, otherwise, you'll have to modify the code. 
+In this file you can find parameters for postprocessing loop and the path for the models.
+Feel free to change values and colors to fit to your needs.
+
+>If you want to try another model, you can change the path. Be careful to not having custom objects in you model, otherwise, you'll have to modify the code.
+
 
 ## Contributing
 
