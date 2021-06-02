@@ -10,7 +10,7 @@ Segment mouse lungs and metastasis on MRI images.
 
 This plugin is a demo for the [Deepmeta project](https://github.com/EdgarLefevre/DeepMeta).
 
-![Lungs segmentation](docs/_static/screen_napari_lungs.png)
+![Lungs segmentation](https://github.com/EdgarLefevre/napari-deepmeta/blob/main/docs/_static/screen_napari_lungs.png)
 
 ----------------------------------
 
@@ -35,11 +35,11 @@ You can install `napari-deepmeta` via [pip]:
 
 Open a (x, 128, 128) image, go in the plugin menu, add deepmeta plugin to the dock viewer and click on the button.
 
-![Menu](docs/_static/plugin_menu.png)
+![Menu](https://github.com/EdgarLefevre/napari-deepmeta/blob/main/docs/_static/plugin_menu.png?raw=true)
 
 By adding the dock widget, a menu will be created on the left of your Napari instance.
 
-![Deepmeta panel](docs/_static/panel.png)
+![Deepmeta panel](https://github.com/EdgarLefevre/napari-deepmeta/raw/main/docs/_static/panel.png?raw=true)
 
 In this panel you will find two buttons and one checkbox:
 
@@ -52,7 +52,7 @@ In this panel you will find two buttons and one checkbox:
 
 The first time you run the plugin a config file will be created at `~/.config/deepmeta/config.ini`.
 
-![conf.ini](docs/_static/confini.png)
+![conf.ini](https://github.com/EdgarLefevre/napari-deepmeta/blob/main/docs/_static/confini.png?raw=true)
 
 In this file you can find parameters for postprocessing loop and the path for the models.
 Feel free to change values and colors to fit to your needs.

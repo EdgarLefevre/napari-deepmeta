@@ -128,25 +128,28 @@ def postprocess_meta(seg, k1, k2):
     """
     res = []
     for elt in seg:
+        elt = remove_blobs(elt, min_size=3)
         res.append(dilate_and_erode(elt, k1=k1, k2=k2))  # try with 5x5
     return np.array(res)
 
 
-def remove_blobs(img):
+def remove_blobs(img, min_size=10):
     """
-    Remove small blobs (size < 10px) in mask.
+    Remove small blobs in mask.
 
+    :param min_size: Min size of blob to remove (pixels)
+    :type min_size: int
     :param img: Mask
     :type img: np.array
     :return: Mask without blobs
     :rtype: np.array
     """
+    img = img.astype(np.uint8)
     nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(
         img, connectivity=8
     )
     sizes = stats[1:, -1]
     nb_components = nb_components - 1  # remove background
-    min_size = 10
     img2 = np.zeros(output.shape)
     # for every component in the image, you keep it only if it's above min_size
     for i in range(nb_components):
