@@ -1,4 +1,3 @@
-from deepmeta import napari_experimental_provide_dock_widget
 import pytest
 
 # this is your plugin name declared in your napari.plugins entry point
@@ -24,7 +23,6 @@ def test_add_z():
     assert (df.add_z(arr, 3) == np.array([[3, 0, 1], [3, 0, 1]])).all()
 
 
-#
 def test_fix_v():
     import deepmeta._dock_widget as dw
     v = [1, 2, 3]
