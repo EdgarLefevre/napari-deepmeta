@@ -25,13 +25,11 @@ https://napari.org/docs/plugins/index.html
 -->
 
 ## Installation
-
 You can install `napari-deepmeta` via [pip]:
 
     pip install napari-deepmeta
 
 ## Usage
-
 
 Open a (x, 128, 128) image, go in the plugin menu, add deepmeta plugin to the dock viewer and click on the button.
 
