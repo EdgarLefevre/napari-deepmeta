@@ -1,4 +1,4 @@
-from deepmeta import napari_experimental_provide_dock_widget
+import deepmeta
 import pytest
 
 # this is your plugin name declared in your napari.plugins entry point
@@ -8,7 +8,8 @@ MY_WIDGET_NAMES = ["Segment Lungs", "Segment Metas"]
 
 
 @pytest.mark.parametrize("widget_name", MY_WIDGET_NAMES)
-def test_something_with_viewer(widget_name, make_napari_viewer):
+def test_something_with_viewer(widget_name, make_napari_viewer, napari_plugin_manager):
+    napari_plugin_manager.register(deepmeta, name=MY_PLUGIN_NAME)
     viewer = make_napari_viewer()
     num_dw = len(viewer.window._dock_widgets)
     viewer.window.add_plugin_dock_widget(

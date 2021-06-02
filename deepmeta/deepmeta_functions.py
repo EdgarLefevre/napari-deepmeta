@@ -320,7 +320,6 @@ def get_volumes(masks, vol):
     return res
 
 
-# todo: get napari-deepmeta path to have info for path model
 def load_config():
     """
     Function to parse config file, create default one in ~/.config/deepmeta/config.ini.
