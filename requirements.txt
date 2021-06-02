@@ -7,7 +7,7 @@ pytest-qt
 napari==0.4.8
 qtpy==1.9.0
 pyqt5
-tensorflow==2.2.0
+tensorflow
 scikit-image
 numpy
 opencv-python
