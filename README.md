@@ -31,6 +31,14 @@ You can install `napari-deepmeta` via [pip]:
 Open a (x, 128, 128) image, go in the plugin menu, add deepmeta plugin to the dock viewer and click on the button.
 If your image is dark, you can check the contrast option, this will enhance of the image for the network.
 
+## Conf file and custom models
+
+The first time you run the plugin a config file will be created at `~/.config/deepmeta/config.ini`.
+
+In this file you can find parameters for postprocessing loop and the path for the models.
+If you want to try another model, you can change the path. 
+
+>Be careful to not having custom objects in you model, otherwise, you'll have to modify the code. 
 
 ## Contributing
 

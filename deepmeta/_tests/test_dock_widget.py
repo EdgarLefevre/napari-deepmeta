@@ -81,5 +81,5 @@ def test_load_config():
     from pathlib import Path
     from appdirs import user_config_dir
     cfg_loc = Path(user_config_dir(appname="deepmeta")) / "config.ini"
-    assert cfg_loc.exists()
     assert df.load_config()["Deepmeta"] is not None
+    assert cfg_loc.exists()
