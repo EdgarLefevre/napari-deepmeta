@@ -25,13 +25,6 @@ def test_add_z():
     assert (df.add_z(arr, 3) == np.array([[3, 0, 1], [3, 0, 1]])).all()
 
 
-def test_fix_v():
-    import deepmeta._dock_widget as dw
-    v = [1, 2, 3]
-    contours = [1, 2, 3, 4, 5]
-    assert dw.fix_v(v, contours) == [1, 2, 3, 0, 0]
-
-
 def test_get_volumes():
     import deepmeta.deepmeta_functions as df
     import numpy as np

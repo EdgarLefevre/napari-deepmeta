@@ -21,19 +21,28 @@ def create_text(vols):
     return text_parameters, properties
 
 
-def fix_v(v, contours):
-    # unused
-    while len(v) < len(contours):
-        v.append(0)
-    return v
-
-
 def fix_contours(v, contours):
     contours.sort(key=len)
     v.sort()
     while len(contours) > len(v):
         contours.pop(0)
     return contours
+
+
+def reprocess_volume(obj):
+    if obj.layout().count() == 5:
+        new_vol = 0
+        layers = obj.viewer.layers[1:]
+        for shape in layers:
+            for contour in shape.data:
+                contour = np.uint8(contour.round())
+                mask = np.zeros((128, 128))
+                mask[contour[:, 1], contour[:, 2]] = 1
+                mask = ndimage.morphology.binary_fill_holes(mask)
+                new_vol += mask.sum()
+        obj.layout().itemAt(4).widget().setParent(None)
+        elt = QLabel("New total volume {:.3f}mm3".format(new_vol * 0.0047))
+        obj.layout().addWidget(elt)
 
 
 def show_shapes(viewer, non_plottable, vols, color):
@@ -84,19 +93,7 @@ class SegmentLungs(QWidget):
         self.layout().addWidget(btn2)
 
     def _reprocess_volume(self):
-        if self.layout().count() == 4:
-            new_vol = 0
-            layers = self.viewer.layers[1:]
-            for shape in layers:
-                for contour in shape.data:
-                    contour = np.uint8(contour.round())
-                    mask = np.zeros((128, 128))
-                    mask[contour[:, 1], contour[:, 2]] = 1
-                    mask = ndimage.morphology.binary_fill_holes(mask)
-                    new_vol += mask.sum()
-            self.layout().itemAt(3).widget().setParent(None)
-            elt = QLabel("New total volume {:.3f}mm3".format(new_vol * 0.0047))
-            self.layout().addWidget(elt)
+        reprocess_volume(self)
 
     def _click_box(self, state):
         if state == QtCore.Qt.Checked:
@@ -146,17 +143,7 @@ class SegmentMetas(QWidget):
         self.layout().addWidget(btn2)
 
     def _reprocess_volume(self):
-        new_vol = 0
-        layers = self.viewer.layers[1:]
-        for shape in layers:
-            for contour in shape.data:
-                contour = np.uint8(contour.round())
-                mask = np.zeros((128, 128))
-                mask[contour[:, 1], contour[:, 2]] = 1
-                mask = ndimage.morphology.binary_fill_holes(mask)
-                new_vol += mask.sum()
-        elt = QLabel("New total volume {:.3f}mm3".format(new_vol * 0.0047))
-        self.layout().addWidget(elt)
+        reprocess_volume(self)
 
     def _click_box(self, state):
         if state == QtCore.Qt.Checked:
