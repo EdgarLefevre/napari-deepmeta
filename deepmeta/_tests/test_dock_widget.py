@@ -75,6 +75,7 @@ def test_show_shapes(make_napari_viewer):
     dw.show_shapes(viewer, res, [[5]], 'red')
     assert len(viewer.layers) == 1
 
+
 def test_load_config():
     import deepmeta.deepmeta_functions as df
     from pathlib import Path

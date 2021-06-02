@@ -12,6 +12,7 @@ import tensorflow as tf
 import tensorflow.keras as keras
 import tensorflow.keras.backend as K
 import cv2
+import os
 import skimage.measure as measure
 import skimage.exposure as exposure
 
@@ -59,11 +60,11 @@ def border_detected(k, seg):
 
 def weighted_cross_entropy(y_true, y_pred):
     """
-    -- Fonction de coût pondéré --
+    Weighted cross entropy loss
 
-    :param y_true: vrai valeur de y (label)
-    :param y_pred: valeur prédite de y par le modèle
-    :return: valeur de la fonction de cout d'entropie croisée pondérée
+    :param y_true: Ground truth
+    :param y_pred: Prediction
+    :return: Loss value between y_true and y_pred
     """
     try:
         [seg, weight] = tf.unstack(y_true, 2, axis=3)
@@ -112,6 +113,18 @@ def postprocess_loop(seg, cfg):
 
 
 def postprocess_meta(seg, k1, k2):
+    """
+    Run postprocess loop for metas
+
+    :param seg: Network output
+    :type seg: np.array
+    :param k1: Size of dilatation kernel
+    :type k1: int
+    :param k2: Size of erosion kernel
+    :type k2: int
+    :return: Postprocessed seg
+    :rtype: np.array
+    """
     res = []
     for elt in seg:
         res.append(dilate_and_erode(elt, k1=k1, k2=k2))  # try with 5x5
@@ -232,12 +245,12 @@ def seg_lungs(image, cfg):
     return from_mask_to_non_plottable_list(masks), get_volumes(masks, float(cfg["Deepmeta"]["volume"]))
 
 
-def contrast_and_reshape(souris, size=128):
+def contrast_and_reshape(mouse, size=128):
     """
     Enhance image contrast.
 
-    :param souris: Slices of the mouse we want to segment
-    :type souris: np.array
+    :param mouse: Slices of the mouse we want to segment
+    :type mouse: np.array
     :param size: Size of the images (we assume images are squares)
     :type size: int
     :return: Images list with readjusted contrast
@@ -247,17 +260,17 @@ def contrast_and_reshape(souris, size=128):
        If the contrast of the mouse should not be readjusted, the network will fail prediction.
        Same if the image should be contrasted and you do not run it.
     """
-    if len(souris.shape) > 2:
+    if len(mouse.shape) > 2:
         data = []
-        for i in np.arange(souris.shape[0]):
+        for i in np.arange(mouse.shape[0]):
             img_adapteq = exposure.equalize_adapthist(
-                souris[i], clip_limit=0.03
+                mouse[i], clip_limit=0.03
             )  # clip_limit=0.03 de base
             data.append(img_adapteq)
         data = np.array(data).reshape(-1, size, size, 1)
         return data
     else:
-        img_adapteq = exposure.equalize_adapthist(souris, clip_limit=0.03)
+        img_adapteq = exposure.equalize_adapthist(mouse, clip_limit=0.03)
         img = np.array(img_adapteq).reshape(size, size, 1)
         return img
 
@@ -306,6 +319,7 @@ def get_volumes(masks, vol):
     return res
 
 
+# todo: get napari-deepmeta path to have info for path model
 def load_config():
     """
     Function to parse config file, create default one in ~/.config/deepmeta/config.ini.
@@ -320,8 +334,8 @@ def load_config():
             f.write(
                 "[Deepmeta]\n"
                 "volume = 0.0047\n"
-                "path_model_lungs = /home/edgar/Documents/Projects/DeepMeta/data/saved_models/Poumons/best_seg_model_weighted.h5\n"
-                "path_model_metas = /home/edgar/Documents/Projects/DeepMeta/data/saved_models/Metastases/best_seg_weighted.h5\n"
+                "path_model_lungs = " + os.path.abspath(".") + "/models/model_lungs_weighted.h5\n"
+                "path_model_metas = " + os.path.abspath(".") + "/models/model_metas_weighted.h5\n"
                 "Kernel1_size_lungs = 3\n"
                 "Kernel2_size_lungs = 3\n"
                 "Kernel1_size_metas = 3\n"
