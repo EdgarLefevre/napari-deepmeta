@@ -8,6 +8,10 @@
 
 Segment mouse lungs and metastasis on MRI images.
 
+This plugin is a demo for the [Deepmeta project](https://github.com/EdgarLefevre/DeepMeta).
+
+![Lungs segmentation](docs/_static/screen_napari_lungs.png)
+
 ----------------------------------
 
 This [napari] plugin was generated with [Cookiecutter] using with [@napari]'s [cookiecutter-napari-plugin] template.
