@@ -1,3 +1,4 @@
+from deepmeta import napari_experimental_provide_dock_widget
 import pytest
 
 # this is your plugin name declared in your napari.plugins entry point
@@ -81,3 +82,35 @@ def test_load_config():
     cfg_loc = Path(user_config_dir(appname="deepmeta")) / "config.ini"
     assert df.load_config()["Deepmeta"] is not None
     assert cfg_loc.exists()
+
+
+def test_predict_seg():
+    import deepmeta.deepmeta_functions as df
+    import numpy as np
+    cfg = df.load_config()
+    imgs = [np.zeros((1, 128, 128, 1))]
+    res = df.predict_seg(imgs, cfg["Deepmeta"]["path_model_lungs"])
+    assert res is not None
+    assert res.shape == (1, 128, 128, 1)
+
+
+def test_wei_ce():
+    import deepmeta.deepmeta_functions as df
+    import tensorflow as tf
+    ytrue = tf.zeros((1, 128, 128, 1))
+    ypred = tf.ones((1, 128, 128, 1))
+    res = df.weighted_cross_entropy(ytrue, ypred)
+    assert res is not None
+    assert tf.math.reduce_sum(res) != 0
+
+
+def test_contrast():
+    import deepmeta.deepmeta_functions as df
+    import tensorflow as tf
+    import numpy as np
+    seg = tf.ones((2, 128, 128))
+    res = df.contrast_and_reshape(seg)
+    seg2 = tf.ones((128, 128))
+    res2 = df.contrast_and_reshape(seg2)
+    assert np.shape(res) == (2, 128, 128, 1)
+    assert np.shape(res2) == (128, 128, 1)

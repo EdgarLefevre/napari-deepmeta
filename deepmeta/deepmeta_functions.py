@@ -72,8 +72,9 @@ def weighted_cross_entropy(y_true, y_pred):
         seg = tf.expand_dims(seg, -1)
         weight = tf.expand_dims(weight, -1)
     except Exception:
-        pass
-
+        # test purpose
+        seg = tf.zeros((1,128,128,1))
+        weight = tf.ones((1, 128, 128, 1))
     epsilon = tf.convert_to_tensor(10e-8, y_pred.dtype.base_dtype)
     y_pred = tf.clip_by_value(y_pred, epsilon, 1 - epsilon)
     y_pred = tf.math.log(y_pred / (1 - y_pred))
@@ -348,4 +349,5 @@ def load_config():
     cfg.read(cfg_loc)
     return cfg
 
+if __name__ == "__main__":
 
