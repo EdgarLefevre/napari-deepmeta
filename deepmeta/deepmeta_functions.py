@@ -348,6 +348,3 @@ def load_config():
     cfg = ConfigParser()
     cfg.read(cfg_loc)
     return cfg
-
-if __name__ == "__main__":
-
