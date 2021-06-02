@@ -10,7 +10,7 @@ Segment mouse lungs and metastasis on MRI images.
 
 This plugin is a demo for the [Deepmeta project](https://github.com/EdgarLefevre/DeepMeta).
 
-![Lungs segmentation](https://github.com/EdgarLefevre/napari-deepmeta/blob/main/docs/_static/screen_napari_lungs.png)
+![Lungs segmentation](https://github.com/EdgarLefevre/napari-deepmeta/blob/main/docs/_static/screen_napari_lungs.png?raw=true)
 
 ----------------------------------
 
@@ -30,7 +30,6 @@ You can install `napari-deepmeta` via [pip]:
     pip install napari-deepmeta
 
 ## Usage
-
 Open a (x, 128, 128) image, go in the plugin menu, add deepmeta plugin to the dock viewer and click on the button.
 
 ![Menu](https://github.com/EdgarLefevre/napari-deepmeta/blob/main/docs/_static/plugin_menu.png?raw=true)
