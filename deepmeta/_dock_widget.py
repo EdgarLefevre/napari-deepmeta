@@ -71,6 +71,15 @@ def show_total_vol(layout, vols):
     layout.addWidget(elt)
 
 
+def load_img(obj, path):
+    import skimage.io as io
+    import deepmeta.deepmeta_functions as df
+    img = io.imread(path, plugin="tifffile")
+    img = df.contrast_and_reshape(img).reshape(128,128,128)
+    obj.viewer.add_image(img, name="mouse")
+    return img
+
+
 class SegmentLungs(QWidget):
     def __init__(self, napari_viewer):
         import deepmeta.deepmeta_functions as df
@@ -171,7 +180,38 @@ class SegmentMetas(QWidget):
             print("You do not have only one image opened.")
 
 
+class Demo(QWidget):
+    def __init__(self, napari_viewer):
+        import deepmeta.deepmeta_functions as df
+        super().__init__()
+        self.cfg = df.load_config()
+        self.viewer = napari_viewer
+        self.setLayout(QVBoxLayout())
+
+        btn = QPushButton("Demo Lung Seg")
+        btn.clicked.connect(self._on_click)
+        self.layout().addWidget(btn)
+
+        btn2 = QPushButton("Demo Meta Seg")
+        btn2.clicked.connect(self._on_click2)
+        self.layout().addWidget(btn2)
+
+    def _on_click(self):
+        import deepmeta.deepmeta_functions as df
+        image = load_img(self, "ressources/souris_8.tif")
+        non_plottable, vols = df.seg_lungs(image, self.cfg)
+        show_total_vol(self.layout(), vols)
+        show_shapes(self.viewer, non_plottable, vols, self.cfg["Deepmeta"]["color_lungs"])
+
+    def _on_click2(self):
+        import deepmeta.deepmeta_functions as df
+        image = load_img(self, "ressources/souris_8.tif")
+        non_plottable, vols = df.seg_metas(image, self.cfg)
+        show_total_vol(self.layout(), vols)
+        show_shapes(self.viewer, non_plottable, vols, self.cfg["Deepmeta"]["color_metas"])
+
+
 @napari_hook_implementation
 def napari_experimental_provide_dock_widget():
     # you can return either a single widget, or a sequence of widgets
-    return [SegmentLungs, SegmentMetas]
+    return [SegmentLungs, SegmentMetas, Demo]
