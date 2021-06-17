@@ -296,6 +296,7 @@ def seg_metas(image, cfg):
                              int(cfg["Deepmeta"]["Kernel1_size_metas"]),
                              int(cfg["Deepmeta"]["Kernel2_size_metas"])
                              )
+    masks /= 255
     return from_mask_to_non_plottable_list(masks), get_volumes(masks, float(cfg["Deepmeta"]["volume"]))
 
 
