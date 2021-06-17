@@ -66,6 +66,8 @@ def show_shapes(viewer, non_plottable, vols, color):
 
 
 def show_total_vol(layout, vols):
+    if layout.count() == 5:  # check if volume label is already here
+        layout.itemAt(4).widget().setParent(None)
     vol_tot = np.array([np.array(l).sum() for l in vols]).sum()
     elt = QLabel("Total volume {:.3f}mm3".format(vol_tot))
     layout.addWidget(elt)
