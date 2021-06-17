@@ -77,9 +77,16 @@ def load_img(obj):
     import skimage.io as io
     import deepmeta.deepmeta_functions as df
     img = io.imread(obj.img_path, plugin="tifffile")
-    img = df.contrast_and_reshape(img).reshape(128,128,128)
+    img = df.contrast_and_reshape(img).reshape(128, 128, 128)
     obj.viewer.add_image(img, name="mouse")
     return img
+
+
+def clean_layers(obj):
+    if len(obj.viewer.layers) != 0:
+        while obj.viewer.layers:
+            obj.viewer.layers.pop()
+        obj.layout().itemAt(3).widget().setParent(None)
 
 
 class SegmentLungs(QWidget):
@@ -202,6 +209,7 @@ class Demo(QWidget):
 
     def _on_click(self):
         import deepmeta.deepmeta_functions as df
+        clean_layers(self)
         image = load_img(self)
         non_plottable, vols = df.seg_lungs(image, self.cfg)
         show_total_vol(self.layout(), vols)
@@ -209,6 +217,7 @@ class Demo(QWidget):
 
     def _on_click2(self):
         import deepmeta.deepmeta_functions as df
+        clean_layers(self)
         image = load_img(self)
         non_plottable, vols = df.seg_metas(image, self.cfg)
         show_total_vol(self.layout(), vols)

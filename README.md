@@ -25,6 +25,7 @@ https://napari.org/docs/plugins/index.html
 -->
 
 ## Installation
+
 You can install `napari-deepmeta` via [pip]:
 
     pip install napari-deepmeta
@@ -44,6 +45,10 @@ In this panel you will find two buttons and one checkbox:
 + The second, *Reprocess Volume*, is useful when you modify contours. It will reprocess all slices to give you a new volume.
 + The checkbox is here to enhance contrast if your image is dark.
 
+## Demo
+
+If you just want to see what we've done, you can try the plugin with the Demo button, this button will load an image and process it
+as if you use the plugin in a classic way.
 
 ## Conf file and custom models
 
