@@ -323,6 +323,7 @@ def get_volumes(masks, vol):
     return res
 
 
+
 def load_config():
     """
     Function to parse config file, create default one in ~/.config/deepmeta/config.ini.

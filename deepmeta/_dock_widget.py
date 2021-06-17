@@ -1,8 +1,8 @@
-from napari_plugin_engine import napari_hook_implementation
-from qtpy.QtWidgets import QWidget, QPushButton, QCheckBox, QLabel, QVBoxLayout
-from qtpy import QtCore
 import numpy as np
 import scipy.ndimage as ndimage
+from napari_plugin_engine import napari_hook_implementation
+from qtpy import QtCore
+from qtpy.QtWidgets import QWidget, QPushButton, QCheckBox, QLabel, QVBoxLayout
 
 
 def create_text(vols):
@@ -30,7 +30,7 @@ def fix_contours(v, contours):
 
 
 def reprocess_volume(obj):
-    if obj.layout().count() == 5:
+    if obj.layout().count() == 5:  # check if volume label is already here
         new_vol = 0
         layers = obj.viewer.layers[1:]
         for shape in layers:
@@ -41,7 +41,7 @@ def reprocess_volume(obj):
                 mask = ndimage.morphology.binary_fill_holes(mask)
                 new_vol += mask.sum()
         obj.layout().itemAt(4).widget().setParent(None)
-        elt = QLabel("New total volume {:.3f}mm3".format(new_vol * 0.0047))
+        elt = QLabel("New total volume {:.3f}mm3".format(new_vol * float(obj.cfg["Deepmeta"]["volume"])))
         obj.layout().addWidget(elt)
 
 
@@ -71,10 +71,10 @@ def show_total_vol(layout, vols):
     layout.addWidget(elt)
 
 
-def load_img(obj, path):
+def load_img(obj):
     import skimage.io as io
     import deepmeta.deepmeta_functions as df
-    img = io.imread(path, plugin="tifffile")
+    img = io.imread(obj.img_path, plugin="tifffile")
     img = df.contrast_and_reshape(img).reshape(128,128,128)
     obj.viewer.add_image(img, name="mouse")
     return img
@@ -183,10 +183,12 @@ class SegmentMetas(QWidget):
 class Demo(QWidget):
     def __init__(self, napari_viewer):
         import deepmeta.deepmeta_functions as df
+        import os
         super().__init__()
         self.cfg = df.load_config()
         self.viewer = napari_viewer
         self.setLayout(QVBoxLayout())
+        self.img_path = os.path.dirname(os.path.realpath(__file__)) + "/ressources/souris_8.tif"
 
         btn = QPushButton("Demo Lung Seg")
         btn.clicked.connect(self._on_click)
@@ -198,14 +200,14 @@ class Demo(QWidget):
 
     def _on_click(self):
         import deepmeta.deepmeta_functions as df
-        image = load_img(self, "ressources/souris_8.tif")
+        image = load_img(self)
         non_plottable, vols = df.seg_lungs(image, self.cfg)
         show_total_vol(self.layout(), vols)
         show_shapes(self.viewer, non_plottable, vols, self.cfg["Deepmeta"]["color_lungs"])
 
     def _on_click2(self):
         import deepmeta.deepmeta_functions as df
-        image = load_img(self, "ressources/souris_8.tif")
+        image = load_img(self)
         non_plottable, vols = df.seg_metas(image, self.cfg)
         show_total_vol(self.layout(), vols)
         show_shapes(self.viewer, non_plottable, vols, self.cfg["Deepmeta"]["color_metas"])
