@@ -339,8 +339,8 @@ def load_config():
             f.write(
                 "[Deepmeta]\n"
                 "volume = 0.0047\n"
-                "path_model_lungs = " + os.path.abspath(".") + "/models/model_lungs_weighted.h5\n"
-                "path_model_metas = " + os.path.abspath(".") + "/models/model_metas_weighted.h5\n"
+                "path_model_lungs = " + os.path.dirname(os.path.realpath(__file__)) + "/resources/models/model_lungs_weighted.h5\n"
+                "path_model_metas = " + os.path.dirname(os.path.realpath(__file__)) + "/resources/models/model_metas_weighted.h5\n"
                 "Kernel1_size_lungs = 3\n"
                 "Kernel2_size_lungs = 3\n"
                 "Kernel1_size_metas = 3\n"

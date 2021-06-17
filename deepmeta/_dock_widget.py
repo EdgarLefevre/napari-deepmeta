@@ -197,7 +197,7 @@ class Demo(QWidget):
         self.cfg = df.load_config()
         self.viewer = napari_viewer
         self.setLayout(QVBoxLayout())
-        self.img_path = os.path.dirname(os.path.realpath(__file__)) + "/ressources/souris_8.tif"
+        self.img_path = os.path.dirname(os.path.realpath(__file__)) + "/resources/souris_8.tif"
 
         btn = QPushButton("Demo Lung Seg")
         btn.clicked.connect(self._on_click)
