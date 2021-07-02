@@ -8,6 +8,7 @@ import numpy as np
 from pathlib import Path
 from appdirs import user_config_dir
 from configparser import ConfigParser
+from scipy import ndimage
 import tensorflow as tf
 import tensorflow.keras as keras
 import tensorflow.keras.backend as K
@@ -129,7 +130,7 @@ def postprocess_meta(seg, k1, k2):
     res = []
     for elt in seg:
         elt = remove_blobs(elt, min_size=3)
-        res.append(dilate_and_erode(elt, k1=k1, k2=k2))  # try with 5x5
+        res.append(dilate_and_erode(elt, k1=k1, k2=k2))
     return np.array(res)
 
 
@@ -229,7 +230,9 @@ def seg_lungs_(image, cfg):
     :rtype: List
     """
     path_model_seg = cfg["Deepmeta"]["path_model_lungs"]
-    masks = predict_seg(image, path_model_seg).reshape(128, 128, 128)
+    masks = predict_seg(image, path_model_seg).reshape(len(image), 128, 128)
+    masks = laplace(image, masks)
+    masks = lungs_sanity_check(masks)
     masks = postprocess_loop(masks, cfg)
     return masks
 
@@ -290,8 +293,8 @@ def seg_metas(image, cfg):
     """
     lungs_masks = seg_lungs_(image, cfg)
     path_model_seg = cfg["Deepmeta"]["path_model_metas"]
-    masks = predict_seg(image, path_model_seg).reshape(128, 128, 128)
-    masks = (lungs_masks * masks).reshape(128, 128, 128)
+    masks = predict_seg(image, path_model_seg).reshape(len(image), 128, 128)
+    masks = (lungs_masks * masks).reshape(len(image), 128, 128)
     masks = postprocess_meta(masks,
                              int(cfg["Deepmeta"]["Kernel1_size_metas"]),
                              int(cfg["Deepmeta"]["Kernel2_size_metas"])
@@ -352,3 +355,56 @@ def load_config():
     cfg = ConfigParser()
     cfg.read(cfg_loc)
     return cfg
+
+
+def laplace(img_stack, mask_list):
+    """
+    Remove false positives in lung segmentation. Apply a laplace of gaussian filter on slices, if the mean value of the
+    result is <1 we remove the mask.
+
+    .. note::
+       We process only first and last slices (until we find a value >1). This ensure that we do not remove false
+       negative slices.
+
+    :param img_stack: Full image stack (dataset).
+    :type img_stack: np.array
+    :param mask_list: Full lung segmentation output
+    :type mask_list: np.array
+    :return: Updated mask list
+    :rtype: np.array
+    """
+    img_stack2 = (img_stack * 255).astype(np.uint8)
+    for i, img in enumerate(img_stack2):
+        new_im = ndimage.gaussian_laplace(img, sigma=7)
+        if np.mean(new_im) < 1:
+            mask_list[i] = np.zeros((128, 128))
+        else:
+            break
+    for i, img in enumerate(img_stack2[::-1]):
+        new_im = ndimage.gaussian_laplace(img, sigma=7)
+        if np.mean(new_im) < 1:
+            mask_list[(len(mask_list)-1)-i] = np.zeros((128, 128))
+        else:
+            break
+    return mask_list
+
+
+def lungs_sanity_check(mask_list):
+    """
+    Check if there is some false positive. If mask < 15px -> mask is null.
+    If i-1 and i+1 do not contain mask, i does not contains a mask either.
+
+    :param mask_list: Lungs segmentation output
+    :type mask_list: np.array
+    :return: Checked segmentation output
+    :rtype: np.array
+    """
+    mask_list[0] = np.zeros((128, 128))
+    mask_list[-1] = np.zeros((128, 128))
+    for i in range(1, len(mask_list)-1):
+        if mask_list[i].sum() > 15:
+            if mask_list[i-1].sum() < 15 and mask_list[i+1].sum() < 15:
+                mask_list[i] = np.zeros((128, 128))
+        else:
+            mask_list[i] = np.zeros((128, 128))
+    return mask_list

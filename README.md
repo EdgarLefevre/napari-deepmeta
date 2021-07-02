@@ -30,7 +30,11 @@ You can install `napari-deepmeta` via [pip]:
 
     pip install napari-deepmeta
 
+> We advise you to create a specific python virtual environment in order to have a clean installation.
+
 ## Usage
+In a terminal, just type `napari` to open napari.
+
 Open a (x, 128, 128) image, go in the plugin menu, add deepmeta plugin to the dock viewer and click on the button.
 
 ![Menu](https://github.com/EdgarLefevre/napari-deepmeta/blob/main/docs/_static/plugin_menu.png?raw=true)

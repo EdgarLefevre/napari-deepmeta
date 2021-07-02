@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.ndimage as ndimage
+import skimage.transform as transform
 from napari_plugin_engine import napari_hook_implementation
 from qtpy import QtCore
 from qtpy.QtWidgets import QWidget, QPushButton, QCheckBox, QLabel, QVBoxLayout
@@ -30,7 +31,7 @@ def fix_contours(v, contours):
 
 
 def reprocess_volume(obj):
-    if obj.layout().count() == 5:  # check if volume label is already here
+    if obj.layout().count() == 6:  # check if volume label is already here
         new_vol = 0
         layers = obj.viewer.layers[1:]
         for shape in layers:
@@ -40,7 +41,7 @@ def reprocess_volume(obj):
                 mask[contour[:, 1], contour[:, 2]] = 1
                 mask = ndimage.morphology.binary_fill_holes(mask)
                 new_vol += mask.sum()
-        obj.layout().itemAt(4).widget().setParent(None)
+        obj.layout().itemAt(5).widget().setParent(None)
         elt = QLabel("New total volume {:.3f}mm3".format(new_vol * float(obj.cfg["Deepmeta"]["volume"])))
         obj.layout().addWidget(elt)
 
@@ -66,8 +67,8 @@ def show_shapes(viewer, non_plottable, vols, color):
 
 
 def show_total_vol(layout, vols):
-    if layout.count() == 5:  # check if volume label is already here
-        layout.itemAt(4).widget().setParent(None)
+    if layout.count() == 6:  # check if volume label is already here
+        layout.itemAt(5).widget().setParent(None)
     vol_tot = np.array([np.array(l).sum() for l in vols]).sum()
     elt = QLabel("Total volume {:.3f}mm3".format(vol_tot))
     layout.addWidget(elt)
@@ -82,12 +83,27 @@ def load_img(obj):
     return img
 
 
-def clean_layers(obj):
+def clean_layers(obj, vol_id=5):
     if len(obj.viewer.layers) != 0:
         while obj.viewer.layers:
             obj.viewer.layers.pop()
-        obj.layout().itemAt(3).widget().setParent(None)
+        try:
+            obj.layout().itemAt(vol_id).widget().setParent(None)
+        except:
+            print("no volume displayed")
 
+
+def prepare_image(obj):
+    image = None
+    if len(obj.viewer.layers) == 1:
+        image = obj.viewer.layers[0].data / 255
+        image = transform.resize(image, (len(image), 128, 128),
+                                 anti_aliasing=True)
+        clean_layers(obj)
+        obj.viewer.add_image(image, name="mouse")
+    else:
+        print("You do not have only one image opened.")
+    return image
 
 class SegmentLungs(QWidget):
     def __init__(self, napari_viewer):
@@ -110,6 +126,13 @@ class SegmentLungs(QWidget):
         btn2.clicked.connect(self._reprocess_volume)
         self.layout().addWidget(btn2)
 
+        btn3 = QPushButton("Clear")
+        btn3.clicked.connect(self._clean)
+        self.layout().addWidget(btn3)
+
+    def _clean(self):
+        clean_layers(self)
+
     def _reprocess_volume(self):
         reprocess_volume(self)
 
@@ -121,22 +144,13 @@ class SegmentLungs(QWidget):
 
     def _on_click(self):
         import deepmeta.deepmeta_functions as df
-        if len(self.viewer.layers) == 1:
-            image = self.viewer.layers[0].data / 255
-            im_shape = np.shape(image)
-            try:
-                if im_shape[-1] == 128 and im_shape[-2] == 128:
-                    if self.contrast:
-                        image = df.contrast_and_reshape(image)
-                    non_plottable, vols = df.seg_lungs(image, self.cfg)
-                    show_total_vol(self.layout(), vols)
-                    show_shapes(self.viewer, non_plottable, vols, self.cfg["Deepmeta"]["color_lungs"])
-                else:
-                    print("Image shape should be (X, 128, 128)")
-            except IndexError:
-                print("Image should at least have two dimensions")
-        else:
-            print("You do not have only one image opened.")
+        image = prepare_image(self)
+        if image is not None:
+            if self.contrast:
+                image = df.contrast_and_reshape(image)
+            non_plottable, vols = df.seg_lungs(image, self.cfg)
+            show_total_vol(self.layout(), vols)
+            show_shapes(self.viewer, non_plottable, vols, self.cfg["Deepmeta"]["color_lungs"])
 
 
 class SegmentMetas(QWidget):
@@ -160,6 +174,13 @@ class SegmentMetas(QWidget):
         btn2.clicked.connect(self._reprocess_volume)
         self.layout().addWidget(btn2)
 
+        btn3 = QPushButton("Clear")
+        btn3.clicked.connect(self._clean)
+        self.layout().addWidget(btn3)
+
+    def _clean(self):
+        clean_layers(self)
+
     def _reprocess_volume(self):
         reprocess_volume(self)
 
@@ -171,22 +192,14 @@ class SegmentMetas(QWidget):
 
     def _on_click(self):
         import deepmeta.deepmeta_functions as df
-        if len(self.viewer.layers) == 1:
-            image = self.viewer.layers[0].data / 255
-            im_shape = np.shape(image)
-            try:
-                if im_shape[-1] == 128 and im_shape[-2] == 128:
-                    if self.contrast:
-                        image = df.contrast_and_reshape(image)
-                    non_plottable, vols = df.seg_metas(image, self.cfg)
-                    show_total_vol(self.layout(), vols)
-                    show_shapes(self.viewer, non_plottable, vols, self.cfg["Deepmeta"]["color_metas"])
-                else:
-                    print("Image shape should be (X, 128, 128)")
-            except IndexError:
-                print("Image should at least have two dimensions")
-        else:
-            print("You do not have only one image opened.")
+        image = prepare_image(self)
+        if image is not None:
+            if self.contrast:
+                image = df.contrast_and_reshape(image)
+            non_plottable, vols = df.seg_metas(image, self.cfg)
+            show_total_vol(self.layout(), vols)
+            show_shapes(self.viewer, non_plottable, vols, self.cfg["Deepmeta"]["color_metas"])
+
 
 
 class Demo(QWidget):
@@ -209,7 +222,7 @@ class Demo(QWidget):
 
     def _on_click(self):
         import deepmeta.deepmeta_functions as df
-        clean_layers(self)
+        clean_layers(self, 3)
         image = load_img(self)
         non_plottable, vols = df.seg_lungs(image, self.cfg)
         show_total_vol(self.layout(), vols)
@@ -217,7 +230,7 @@ class Demo(QWidget):
 
     def _on_click2(self):
         import deepmeta.deepmeta_functions as df
-        clean_layers(self)
+        clean_layers(self, 3)
         image = load_img(self)
         non_plottable, vols = df.seg_metas(image, self.cfg)
         show_total_vol(self.layout(), vols)
