@@ -65,6 +65,16 @@ Feel free to change values and colors to fit to your needs.
 
 >If you want to try another model, you can change the path. Be careful to not having custom objects in you model, otherwise, you'll have to modify the code.
 
+## Known issue
+
+If you encounters this error : `libGL error: failed to load driver: swrast`
+
+Copy your lib file into your anaconda lib folder : 
+
+```sh
+cp /usr/lib/libstdc++.so.6 (conda_path)/lib/
+```
+
 
 ## Contributing
 
