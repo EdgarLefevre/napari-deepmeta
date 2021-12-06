@@ -15,6 +15,7 @@ This plugin is a demo for the [Deepmeta project](https://github.com/EdgarLefevre
 
 ----------------------------------
 
+
 This [napari] plugin was generated with [Cookiecutter] using with [@napari]'s [cookiecutter-napari-plugin] template.
 
 <!--
