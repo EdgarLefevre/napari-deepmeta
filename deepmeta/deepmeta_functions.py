@@ -14,6 +14,7 @@ import tensorflow.keras as keras
 import tensorflow.keras.backend as K
 import cv2
 import os
+import cc3d
 import skimage.measure as measure
 import skimage.exposure as exposure
 
@@ -300,7 +301,7 @@ def seg_metas(image, cfg):
                              int(cfg["Deepmeta"]["Kernel2_size_metas"])
                              )
     masks /= 255
-    return from_mask_to_non_plottable_list(masks), get_volumes(masks, float(cfg["Deepmeta"]["volume"]))
+    return from_mask_to_non_plottable_list(masks), get_volumes(masks, float(cfg["Deepmeta"]["volume"])), get_meta_nb(masks)
 
 
 def get_volumes(masks, vol):
@@ -326,6 +327,10 @@ def get_volumes(masks, vol):
             res.append(tmp)
     return res
 
+
+def get_meta_nb(masks):
+    _, N = cc3d.connected_components(masks, return_N=True, connectivity=18)
+    return N
 
 
 def load_config():

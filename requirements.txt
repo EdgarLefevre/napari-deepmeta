@@ -11,3 +11,4 @@ tensorflow
 scikit-image
 numpy
 opencv-python
+connected-components-3d

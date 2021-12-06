@@ -66,12 +66,16 @@ def show_shapes(viewer, non_plottable, vols, color):
                               )
 
 
-def show_total_vol(layout, vols):
-    if layout.count() == 6:  # check if volume label is already here
+def show_total_vol(layout, vols, nb):
+    if layout.count() >= 6:  # check if volume label is already here
+        layout.itemAt(6).widget().setParent(None)
         layout.itemAt(5).widget().setParent(None)
     vol_tot = np.array([np.array(l).sum() for l in vols]).sum()
     elt = QLabel("Total volume {:.3f}mm3".format(vol_tot))
     layout.addWidget(elt)
+    if nb != None:
+        elt2 = QLabel("Metastases number {}".format(nb))
+        layout.addWidget(elt2)
 
 
 def load_img(obj):
@@ -88,6 +92,7 @@ def clean_layers(obj, vol_id=5):
         while obj.viewer.layers:
             obj.viewer.layers.pop()
         try:
+            obj.layout().itemAt(vol_id + 1).widget().setParent(None)
             obj.layout().itemAt(vol_id).widget().setParent(None)
         except:
             print("no volume displayed")
@@ -149,7 +154,7 @@ class SegmentLungs(QWidget):
             if self.contrast:
                 image = df.contrast_and_reshape(image)
             non_plottable, vols = df.seg_lungs(image, self.cfg)
-            show_total_vol(self.layout(), vols)
+            show_total_vol(self.layout(), vols, None)
             show_shapes(self.viewer, non_plottable, vols, self.cfg["Deepmeta"]["color_lungs"])
 
 
@@ -196,8 +201,8 @@ class SegmentMetas(QWidget):
         if image is not None:
             if self.contrast:
                 image = df.contrast_and_reshape(image)
-            non_plottable, vols = df.seg_metas(image, self.cfg)
-            show_total_vol(self.layout(), vols)
+            non_plottable, vols, meta_nb = df.seg_metas(image, self.cfg)
+            show_total_vol(self.layout(), vols, meta_nb)
             show_shapes(self.viewer, non_plottable, vols, self.cfg["Deepmeta"]["color_metas"])
 
 
@@ -225,15 +230,15 @@ class Demo(QWidget):
         clean_layers(self, 3)
         image = load_img(self)
         non_plottable, vols = df.seg_lungs(image, self.cfg)
-        show_total_vol(self.layout(), vols)
+        show_total_vol(self.layout(), vols, None)
         show_shapes(self.viewer, non_plottable, vols, self.cfg["Deepmeta"]["color_lungs"])
 
     def _on_click2(self):
         import deepmeta.deepmeta_functions as df
         clean_layers(self, 3)
         image = load_img(self)
-        non_plottable, vols = df.seg_metas(image, self.cfg)
-        show_total_vol(self.layout(), vols)
+        non_plottable, vols, nb_metas = df.seg_metas(image, self.cfg)
+        show_total_vol(self.layout(), vols, nb_metas)
         show_shapes(self.viewer, non_plottable, vols, self.cfg["Deepmeta"]["color_metas"])
 
 
