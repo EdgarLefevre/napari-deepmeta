@@ -100,11 +100,10 @@ def test_wei_ce():
 
 def test_contrast():
     import deepmeta.deepmeta_functions as df
-    import tensorflow as tf
     import numpy as np
-    seg = tf.ones((2, 128, 128))
+    seg = np.ones((2, 128, 128))
     res = df.contrast_and_reshape(seg)
-    seg2 = tf.ones((128, 128))
+    seg2 = np.ones((128, 128))
     res2 = df.contrast_and_reshape(seg2)
     assert np.shape(res) == (2, 128, 128, 1)
     assert np.shape(res2) == (128, 128, 1)
