@@ -3,19 +3,14 @@ display_name: napari DeepMeta
 contributions:
   commands:
     - id: napari-deepmeta.make_qwidget
-      python_name: napari_deepmeta._widget:ExampleQWidget
-      title: Make example QWidget
-    - id: napari-deepmeta.make_magic_widget
-      python_name: napari_deepmeta._widget:example_magic_widget
-      title: Make example magic widget
-    - id: napari-deepmeta.make_func_widget
-      python_name: napari_deepmeta._widget:example_function_widget
-      title: Make example function widget
+      python_name: napari_deepmeta._widget:DeepmetaWidget
+      title: DeepmetaWidget
+    - id: napari-deepmeta.make_qwidget2
+      python_name: napari_deepmeta._widget:DeepmetaDemoWidget
+      title: DeepmetaDemoWidget
+
   widgets:
     - command: napari-deepmeta.make_qwidget
-      display_name: Example QWidget
-    - command: napari-deepmeta.make_magic_widget
-      display_name: Example Magic Widget
-    - command: napari-deepmeta.make_func_widget
-      autogenerate: true
-      display_name: Example Function Widget
+      display_name: DeepmetaWidget
+    - command: napari-deepmeta.make_qwidget2
+      display_name: DeepmetaDemoWidget
