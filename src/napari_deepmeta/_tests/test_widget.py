@@ -16,9 +16,7 @@ def test_deepmeta_widget(make_napari_viewer, capsys):
     # call our widget method
     my_widget._on_click()
 
-    # read captured output and check that it's as we expected
-    captured = capsys.readouterr()
-    assert captured.out == "napari has 1 layers\n"
+    assert viewer.layout().count() == 5
 
 
 def test_demo_widget(make_napari_viewer, capsys):
@@ -32,6 +30,4 @@ def test_demo_widget(make_napari_viewer, capsys):
     # call our widget method
     my_widget._on_click()
 
-    # read captured output and check that it's as we expected
-    captured = capsys.readouterr()
-    assert captured.out == "napari has 1 layers\n"
+    assert viewer.layout().count() == 8
