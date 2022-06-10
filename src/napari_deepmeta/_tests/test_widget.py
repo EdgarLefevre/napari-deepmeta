@@ -16,7 +16,7 @@ def test_deepmeta_widget(make_napari_viewer, capsys):
     # call our widget method
     my_widget._on_click()
 
-    assert viewer.layout().count() == 5
+    assert len(viewer.layers) == 2
 
 
 def test_demo_widget(make_napari_viewer, capsys):
@@ -30,4 +30,4 @@ def test_demo_widget(make_napari_viewer, capsys):
     # call our widget method
     my_widget._on_click()
 
-    assert viewer.layout().count() == 8
+    assert len(viewer.layers) == 4
