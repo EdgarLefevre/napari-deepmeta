@@ -1,6 +1,6 @@
 import numpy as np
 
-from napari_deepmeta import DeepmetaDemoWidget, DeepmetaWidget
+from napari_deepmeta import DeepmetaWidget
 
 
 # make_napari_viewer is a pytest fixture that returns a napari viewer object
@@ -21,20 +21,21 @@ def test_deepmeta_widget(make_napari_viewer, capsys):
     assert captured.out == "done\n"
 
 
-def test_demo_widget(make_napari_viewer, capsys):
-    # make viewer and add an image layer using our fixture
-    viewer = make_napari_viewer()
-    viewer.add_image(np.random.random((100, 100)))
-
-    # create our widget, passing in the viewer
-    my_widget = DeepmetaDemoWidget(viewer)
-
-    # call our widget method
-    my_widget._on_click()
-
-    # read captured output and check that it's as we expected
-    captured = capsys.readouterr()
-    assert captured.out == "done\n"
+#
+# def test_demo_widget(make_napari_viewer, capsys):
+#     # make viewer and add an image layer using our fixture
+#     viewer = make_napari_viewer()
+#     viewer.add_image(np.random.random((100, 100)))
+#
+#     # create our widget, passing in the viewer
+#     my_widget = DeepmetaDemoWidget(viewer)
+#
+#     # call our widget method
+#     my_widget._on_click()
+#
+#     # read captured output and check that it's as we expected
+#     captured = capsys.readouterr()
+#     assert captured.out == "done\n"
 
 
 def test_add_z():
