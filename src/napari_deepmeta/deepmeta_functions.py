@@ -40,7 +40,8 @@ def contrast_and_reshape(mouse, size=128):
 
 
 def segment_stack(img):
-    model = models.Unet3plus()
+    # device = "cuda" if torch.cuda.is_available() else "cpu"  # marche pas
+    model = models.Unet3plus()  # .to(device)
     model.load_state_dict(
         torch.load(
             os.path.dirname(os.path.realpath(__file__))
@@ -48,7 +49,7 @@ def segment_stack(img):
         )
     )
     model.eval()
-    return model(img)
+    return model(img)  # .to(device))
 
 
 def prepare_mouse(img, contrast):

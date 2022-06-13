@@ -8,18 +8,11 @@
 [![napari hub](https://img.shields.io/endpoint?url=https://api.napari-hub.org/shields/napari-deepmeta)](https://napari-hub.org/plugins/napari-deepmeta)
 
 Mice lungs and metastases segmentation tool.
+This tool is a demo tool for DeepMeta network.
 
 ----------------------------------
 
 This [napari] plugin was generated with [Cookiecutter] using [@napari]'s [cookiecutter-napari-plugin] template.
-
-<!--
-Don't miss the full getting started guide to set up your new package:
-https://github.com/napari/cookiecutter-napari-plugin#getting-started
-
-and review the napari docs for plugin developers:
-https://napari.org/plugins/index.html
--->
 
 ## Installation
 
@@ -33,6 +26,18 @@ To install latest development version :
 
     pip install git+https://github.com/EdgarLefevre/napari-deepmeta.git
 
+
+## Usage
+
+This plugin is designed to process your mouse MRI images with our dataset. It comes with a demo, including one of our
+test images.
+
+By opening the deepmeta demo plugin, you will see an interface with one unique button, by clicking on it, it will load an image,
+run prediction and then draw the masks contours on each slice.
+
+If you open the deepmeta plugin, you will see an interface with one button and 3 checkboxes.
+By checking the checkboxes, you add steps to the pipeline (enhance contrast, do postprocessing, segment metastases).
+Once everything is setup, just click on the button and wait (the waiting time depends on your computer performance.)
 
 ## Contributing
 
