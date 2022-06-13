@@ -45,10 +45,10 @@ def segment_stack(img):
     model.load_state_dict(
         torch.load(
             os.path.dirname(os.path.realpath(__file__))
-            + "/resources/model.pth"
+            + "/resources/model.pth",
+            map_location=torch.device(device),
         )
     )
-    model.to(device)
     model.eval()
     return model(img)  # .to(device))
 
