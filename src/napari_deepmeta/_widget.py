@@ -33,7 +33,7 @@ def load_img(obj):
 
 
 def show_total_vol(layout, masks, organ, nb=None):
-    vol_tot = masks.sum() * 0.0043
+    vol_tot = masks.sum() * 0.0047
     elt = QLabel(f"Total volume {organ} {vol_tot:.3f}mm3")
     layout.addWidget(elt)
     if nb is not None:
